@@ -1,8 +1,7 @@
 package Model;
-
 import java.io.Serializable;
 
-public abstract class  SportsClub implements Serializable,Comparable<SportsClub>{
+public abstract class  SportsClub implements Serializable{
 	String name;
 	String location;
 	int wins;

@@ -1,4 +1,4 @@
-package View;
+package Model;
 import Model.PremierLeagueManager;
 import Model.Serialize;
 import Model.SportsClub;
@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -15,7 +16,9 @@ import javafx.stage.Stage;
 import java.util.*;
 
 public class GuiJavaFx extends Application {
-    PremierLeagueManager club = PremierLeagueManager.getInstance();
+    Serialize load = new Serialize();
+    ArrayList <Object> deserialized = load.deserialize();
+    List<SportsClub> clublistData = (List<SportsClub>) deserialized.get(0);
 
     @Override
     public void start(Stage primaryStage) {
@@ -23,7 +26,6 @@ public class GuiJavaFx extends Application {
         window.setTitle("Premier League");
         AnchorPane first = new AnchorPane();
         Scene addViewFirst = new Scene(first, 680, 450);
-//        Scene addViewFirst = new Scene(first, 800, 800);
         addViewFirst.getStylesheets().add("style.css");
         window.setScene(addViewFirst);
 
@@ -37,7 +39,31 @@ public class GuiJavaFx extends Application {
         AnchorPane.setTopAnchor(clubTable,50d);
         AnchorPane.setBottomAnchor(clubTable,80d);
 
-        first.getChildren().addAll(clubTable,title);
+        Button sortGoals = new Button("Goals");
+        sortGoals.setOnAction(event -> {
+            Collections.sort(clublistData, new SortbyGoals());
+            clubTable.setItems(dataToTable(clublistData));
+        });
+        AnchorPane.setLeftAnchor(sortGoals,20d);
+        AnchorPane.setBottomAnchor(sortGoals,20d);
+
+        Button sortWins = new Button("Wins");
+        sortWins.setOnAction(event -> {
+            Collections.sort(clublistData, new SortbyWins());
+            clubTable.setItems(dataToTable(clublistData));
+        });
+        AnchorPane.setLeftAnchor(sortWins,90d);
+        AnchorPane.setBottomAnchor(sortWins,20d);
+
+        Button sortPoints = new Button("Reset");
+        sortPoints.setOnAction(event -> {
+            Collections.sort(clublistData, new SortByPoints());
+            clubTable.setItems(dataToTable(clublistData));
+        });
+        AnchorPane.setLeftAnchor(sortPoints,160d);
+        AnchorPane.setBottomAnchor(sortPoints,20d);
+
+        first.getChildren().addAll(clubTable,title,sortGoals,sortWins,sortPoints);
         window.showAndWait();
     }
     public ObservableList<SportsClub> dataToTable(List<SportsClub> clubList){
@@ -47,11 +73,7 @@ public class GuiJavaFx extends Application {
     }
 
     public TableView<SportsClub> table(){
-        Serialize load = new Serialize();
-        ArrayList <Object> deserialized = load.deserialize();
-        List<SportsClub> clublistData = (List<SportsClub>) deserialized.get(0);
-        Collections.sort(clublistData);
-
+        Collections.sort(clublistData, new SortByPoints());
 
         TableView<SportsClub> clubTable = new TableView<>();
         TableColumn<SportsClub,String> clubName = new TableColumn<>("Club");

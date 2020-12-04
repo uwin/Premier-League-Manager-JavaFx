@@ -1,6 +1,7 @@
 package Model;
 
-public class FootballClub extends SportsClub implements Comparable<SportsClub> {
+import java.util.Comparator;
+public class FootballClub extends SportsClub {
 	private int goalsReceived;
 	private int goalsScored;
 
@@ -30,15 +31,32 @@ public class FootballClub extends SportsClub implements Comparable<SportsClub> {
 	}
 
 	@Override
-	public int compareTo(SportsClub fc) {
-		if (this.pointCount==fc.getPointCount()) {
-			return this.goalsScored-((FootballClub)(fc)).getGoalsScored();
-		}else return this.pointCount-fc.getPointCount();
-	}
-	@Override
 	public String toString() {
 		return  " \n"+super.toString()+
 				" \ngoalsReceived : " + goalsReceived +
 				" \ngoalsScored   : " + goalsScored;
 	}
+}
+class SortbyPointGoals implements Comparator<SportsClub>
+{
+	public int compare(SportsClub a, SportsClub b)
+	{ if (a.getPointCount()==b.getPointCount()){
+		return ((FootballClub)(a)).getGoalsScored()-((FootballClub)(b)).getGoalsScored();
+	}else return a.getPointCount()-b.getPointCount();
+	}
+}
+class SortbyGoals implements Comparator<SportsClub>
+{
+	public int compare(SportsClub a, SportsClub b)
+	{ return ((FootballClub)(a)).getGoalsScored()-((FootballClub)(b)).getGoalsScored(); }
+}
+class SortbyWins implements Comparator<SportsClub>
+{
+	public int compare(SportsClub a, SportsClub b)
+	{ return a.getWins()-b.getWins(); }
+}
+class SortByPoints implements Comparator<SportsClub>
+{
+	public int compare(SportsClub a, SportsClub b)
+	{ return a.getPointCount()-b.getPointCount(); }
 }
