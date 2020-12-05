@@ -1,24 +1,23 @@
 package Model;
-import Model.PremierLeagueManager;
-import Model.Serialize;
-import Model.SportsClub;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class GuiJavaFx extends Application {
     Serialize load = new Serialize();
     ArrayList <Object> deserialized = load.deserialize();
     List<SportsClub> clublistData = (List<SportsClub>) deserialized.get(0);
+    List<Match> matchlistData = (List<Match>) deserialized.get(1);
 
     @Override
     public void start(Stage primaryStage) {
@@ -63,9 +62,19 @@ public class GuiJavaFx extends Application {
         AnchorPane.setLeftAnchor(sortPoints,160d);
         AnchorPane.setBottomAnchor(sortPoints,20d);
 
-        first.getChildren().addAll(clubTable,title,sortGoals,sortWins,sortPoints);
+        Button genMatch = new Button("Add Match");
+        genMatch.setOnAction(event -> {
+            genarateMatch();
+            Collections.sort(clublistData, new SortbyGoals());
+            clubTable.setItems(dataToTable(clublistData));
+        });
+        AnchorPane.setRightAnchor(genMatch,20d);
+        AnchorPane.setBottomAnchor(genMatch,20d);
+
+        first.getChildren().addAll(clubTable,title,sortGoals,sortWins,sortPoints,genMatch);
         window.showAndWait();
     }
+
     public ObservableList<SportsClub> dataToTable(List<SportsClub> clubList){
         ObservableList<SportsClub> table = FXCollections.observableArrayList();
         table.addAll(clubList);
@@ -119,5 +128,42 @@ public class GuiJavaFx extends Application {
         clubTable.getColumns().add(clubMatch);
 
         return clubTable;
+    }
+
+    public int generateScore(){
+        return (int) (Math.random() * ((20 - 1) + 1)) + 1;
+    }
+    public int generateTeam(){
+        return (int) (Math.random() * (clublistData.size() - 1)+1);
+    }
+
+    public void genarateMatch() {
+        PremierLeagueManager club = PremierLeagueManager.getInstance();
+
+//            date
+        LocalDate start = LocalDate.of(2020, Month.JANUARY, 1);
+        long days = ChronoUnit.DAYS.between(start, LocalDate.now());
+        LocalDate randomDate = start.plusDays(new Random().nextInt((int) days + 1));
+//            score
+        int oneClubScore = generateScore();
+        int twoClubScore = generateScore();
+//            team
+        SportsClub oneClub = clublistData.get(generateTeam());
+        SportsClub twoClub = clublistData.get(generateTeam());
+        while (oneClub==twoClub){
+//            System.out.println("repeat");
+            twoClub = clublistData.get(generateTeam());
+        }
+        club.addMatch(randomDate, oneClub, oneClubScore, twoClub, twoClubScore);
+        load.serialize(clublistData,matchlistData);
+
+        Alert a = new Alert(Alert.AlertType.WARNING);
+        a.setHeaderText("New Match ");
+        a.setContentText("Team A :"+oneClub.getName()+
+                        "\nTeam A Score :"+oneClubScore+
+                        "\nTeam B :"+twoClub.getName()+
+                        "\nTeam B Score :"+twoClubScore+
+                        "\nDate : "+randomDate);
+        a.showAndWait();
     }
 }

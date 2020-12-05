@@ -75,6 +75,7 @@ public class PremierLeagueManager implements LeagueManager{
 		match.setTeamAScore(oneClubScore);
 		match.setTeamBScore(twoClubScore);
 		matchList.add(match);
+		System.out.println("match = " + match);
 	}
 	@Override
 	public void save() {
