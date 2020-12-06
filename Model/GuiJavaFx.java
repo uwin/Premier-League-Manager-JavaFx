@@ -1,87 +1,48 @@
 package Model;
+
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class GuiJavaFx extends Application {
-    Serialize load = new Serialize();
-    ArrayList <Object> deserialized = load.deserialize();
-    List<SportsClub> clublistData = (List<SportsClub>) deserialized.get(0);
-    List<Match> matchlistData = (List<Match>) deserialized.get(1);
+    List<SportsClub> clublistData;
+    List<Match> matchlistData;
+    private boolean state=false;
+
+
+    public void update(){
+        Serialize load = new Serialize();
+        ArrayList <Object> deserialized = load.deserialize();
+        clublistData = (List<SportsClub>) deserialized.get(0);
+        matchlistData= (List<Match>) deserialized.get(1);
+    }
 
     @Override
     public void start(Stage primaryStage) {
         Stage window = new Stage();
         window.setTitle("Premier League");
-        AnchorPane first = new AnchorPane();
-        Scene addViewFirst = new Scene(first, 680, 450);
-        addViewFirst.getStylesheets().add("style.css");
-        window.setScene(addViewFirst);
-
-        Label title = new Label("Club Details");
-        title.setStyle("-fx-font: 20 arial;");
-        AnchorPane.setTopAnchor(title,20d);
-        AnchorPane.setLeftAnchor(title, 20d);
-
-        TableView<SportsClub> clubTable = table();
-        AnchorPane.setLeftAnchor(clubTable,20d);
-        AnchorPane.setTopAnchor(clubTable,50d);
-        AnchorPane.setBottomAnchor(clubTable,80d);
-
-        Button sortGoals = new Button("Goals");
-        sortGoals.setOnAction(event -> {
-            Collections.sort(clublistData, new SortbyGoals());
-            clubTable.setItems(dataToTable(clublistData));
-        });
-        AnchorPane.setLeftAnchor(sortGoals,20d);
-        AnchorPane.setBottomAnchor(sortGoals,20d);
-
-        Button sortWins = new Button("Wins");
-        sortWins.setOnAction(event -> {
-            Collections.sort(clublistData, new SortbyWins());
-            clubTable.setItems(dataToTable(clublistData));
-        });
-        AnchorPane.setLeftAnchor(sortWins,90d);
-        AnchorPane.setBottomAnchor(sortWins,20d);
-
-        Button sortPoints = new Button("Reset");
-        sortPoints.setOnAction(event -> {
-            Collections.sort(clublistData, new SortByPoints());
-            clubTable.setItems(dataToTable(clublistData));
-        });
-        AnchorPane.setLeftAnchor(sortPoints,160d);
-        AnchorPane.setBottomAnchor(sortPoints,20d);
-
-        Button genMatch = new Button("Add Match");
-        genMatch.setOnAction(event -> {
-            genarateMatch();
-            Collections.sort(clublistData, new SortbyGoals());
-            clubTable.setItems(dataToTable(clublistData));
-        });
-        AnchorPane.setRightAnchor(genMatch,20d);
-        AnchorPane.setBottomAnchor(genMatch,20d);
-
-        first.getChildren().addAll(clubTable,title,sortGoals,sortWins,sortPoints,genMatch);
-        window.showAndWait();
+        clubTableScreen(window);
     }
 
-    public ObservableList<SportsClub> dataToTable(List<SportsClub> clubList){
-        ObservableList<SportsClub> table = FXCollections.observableArrayList();
+    public ObservableList dataToTable(List clubList){
+        ObservableList table = FXCollections.observableArrayList();
         table.addAll(clubList);
         return table;
     }
-
-    public TableView<SportsClub> table(){
+    public TableView<SportsClub> clubstable(){
         Collections.sort(clublistData, new SortByPoints());
 
         TableView<SportsClub> clubTable = new TableView<>();
@@ -129,6 +90,154 @@ public class GuiJavaFx extends Application {
 
         return clubTable;
     }
+    public TableView<SportsClub> matchtable(){
+
+        TableView<SportsClub> matchTable = new TableView<>();
+        TableColumn<SportsClub,String> matchDate = new TableColumn<>("Date");
+        matchDate.setMinWidth(80);
+        matchDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+
+        TableColumn<SportsClub,String> teamA = new TableColumn<>("Team A");
+        teamA.setMinWidth(80);
+        teamA.setCellValueFactory(new PropertyValueFactory<>("teamA.name"));
+
+        TableColumn<SportsClub,String> teamAScore = new TableColumn<>("Score");
+        teamAScore.setMinWidth(80);
+        teamAScore.setCellValueFactory(new PropertyValueFactory<>("teamAScore"));
+
+        TableColumn<SportsClub,String> teamB = new TableColumn<>("Team B");
+        teamB.setMinWidth(80);
+        teamB.setCellValueFactory(new PropertyValueFactory<>("teamB.name"));
+
+        TableColumn<SportsClub,String> teamBScore = new TableColumn<>("Score");
+        teamBScore.setMinWidth(80);
+        teamBScore.setCellValueFactory(new PropertyValueFactory<>("teamBScore"));
+
+
+        matchTable.setItems(dataToTable(matchlistData));
+        matchTable.getColumns().add(matchDate);
+        matchTable.getColumns().add(teamA);
+        matchTable.getColumns().add(teamAScore);
+        matchTable.getColumns().add(teamB);
+        matchTable.getColumns().add(teamBScore);
+        return matchTable;
+    }
+
+    private void clubTableScreen(Stage window){
+        AnchorPane first = new AnchorPane();
+        Scene addViewFirst = new Scene(first, 680, 450);
+        window.setScene(addViewFirst);
+
+        update();
+        TableView<SportsClub> clubTable = clubstable();
+        AnchorPane.setLeftAnchor(clubTable,20d);
+        AnchorPane.setTopAnchor(clubTable,50d);
+        AnchorPane.setBottomAnchor(clubTable,80d);
+
+        Button sortGoals = new Button("Goals");
+        sortGoals.setOnAction(event -> {
+            Collections.sort(clublistData, new SortbyGoals());
+            clubTable.setItems(dataToTable(clublistData));
+        });
+        AnchorPane.setLeftAnchor(sortGoals,20d);
+        AnchorPane.setBottomAnchor(sortGoals,20d);
+
+        Button sortWins = new Button("Wins");
+        sortWins.setOnAction(event -> {
+            Collections.sort(clublistData, new SortbyWins());
+            clubTable.setItems(dataToTable(clublistData));
+        });
+        AnchorPane.setLeftAnchor(sortWins,90d);
+        AnchorPane.setBottomAnchor(sortWins,20d);
+
+        Button sortPoints = new Button("Reset");
+        sortPoints.setOnAction(event -> {
+            Collections.sort(clublistData, new SortByPoints());
+            clubTable.setItems(dataToTable(clublistData));
+        });
+        AnchorPane.setLeftAnchor(sortPoints,160d);
+        AnchorPane.setBottomAnchor(sortPoints,20d);
+
+
+        Button genMatch = new Button("Add Match");
+        AnchorPane.setRightAnchor(genMatch,20d);
+        AnchorPane.setBottomAnchor(genMatch,20d);
+
+        genMatch.setOnAction(event -> {
+            genarateMatch();
+            update();
+            Collections.sort(clublistData, new SortByPoints());
+            clubTable.setItems(dataToTable(clublistData));
+
+        });
+
+        Label title = new Label("Club Details");
+        title.setStyle("-fx-font: 20 arial;");
+        AnchorPane.setTopAnchor(title,20d);
+        AnchorPane.setLeftAnchor(title, 20d);
+
+
+        Button switchtable = new Button("switch table");
+        AnchorPane.setRightAnchor(switchtable,200d);
+        AnchorPane.setBottomAnchor(switchtable,20d);
+        switchtable.setOnAction(event -> {
+
+            if (state){
+                clubTableScreen(window);
+                window.show();
+            }else {
+                matchTableScreen(window);
+                window.show();
+            }
+        });
+        first.getChildren().addAll(sortGoals,sortWins,sortPoints,clubTable,title,switchtable,genMatch);
+        window.show();
+    }
+    private void matchTableScreen(Stage window){
+        AnchorPane first = new AnchorPane();
+        Scene addViewFirst = new Scene(first, 680, 450);
+        window.setScene(addViewFirst);
+
+
+        update();
+        TableView<SportsClub> clubTable = matchtable();
+
+        AnchorPane.setLeftAnchor(clubTable,20d);
+        AnchorPane.setTopAnchor(clubTable,50d);
+        AnchorPane.setBottomAnchor(clubTable,80d);
+
+
+        Button genMatch = new Button("Add Match");
+        AnchorPane.setRightAnchor(genMatch,20d);
+        AnchorPane.setBottomAnchor(genMatch,20d);
+        genMatch.setOnAction(event -> {
+            genarateMatch();
+            update();
+            clubTable.setItems(dataToTable(matchlistData));
+
+        });
+
+        Label title = new Label("Match Details");
+        title.setStyle("-fx-font: 20 arial;");
+        AnchorPane.setTopAnchor(title,20d);
+        AnchorPane.setLeftAnchor(title, 20d);
+
+
+        Button switchtable = new Button("switch table");
+        AnchorPane.setRightAnchor(switchtable,200d);
+        AnchorPane.setBottomAnchor(switchtable,20d);
+        switchtable.setOnAction(event -> {
+            if (!state){
+                clubTableScreen(window);
+            }else {
+                matchTableScreen(window);
+            }
+            window.show();
+        });
+
+        first.getChildren().addAll(clubTable,title,switchtable,genMatch);
+        window.show();
+    }
 
     public int generateScore(){
         return (int) (Math.random() * ((20 - 1) + 1)) + 1;
@@ -136,7 +245,6 @@ public class GuiJavaFx extends Application {
     public int generateTeam(){
         return (int) (Math.random() * (clublistData.size() - 1)+1);
     }
-
     public void genarateMatch() {
         PremierLeagueManager club = PremierLeagueManager.getInstance();
 
@@ -154,7 +262,9 @@ public class GuiJavaFx extends Application {
 //            System.out.println("repeat");
             twoClub = clublistData.get(generateTeam());
         }
-        club.addMatch(randomDate, oneClub, oneClubScore, twoClub, twoClubScore);
+
+        matchlistData.add(club.addMatch(randomDate, oneClub, oneClubScore, twoClub, twoClubScore));
+        Serialize load = new Serialize();
         load.serialize(clublistData,matchlistData);
 
         Alert a = new Alert(Alert.AlertType.WARNING);

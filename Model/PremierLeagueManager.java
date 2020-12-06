@@ -39,7 +39,7 @@ public class PremierLeagueManager implements LeagueManager{
 	@Override
 	public void displayTable() { }
 	@Override
-	public void addMatch(LocalDate dateL, SportsClub oneClub, int oneClubScore, SportsClub twoClub, int twoClubScore) {
+	public Match addMatch(LocalDate dateL, SportsClub oneClub, int oneClubScore, SportsClub twoClub, int twoClubScore) {
 
 		oneClub.setMatchCount(oneClub.getMatchCount()+1);
 		twoClub.setMatchCount(twoClub.getMatchCount()+1);
@@ -76,6 +76,7 @@ public class PremierLeagueManager implements LeagueManager{
 		match.setTeamBScore(twoClubScore);
 		matchList.add(match);
 		System.out.println("match = " + match);
+		return match ;
 	}
 	@Override
 	public void save() {

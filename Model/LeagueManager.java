@@ -7,7 +7,7 @@ public  interface LeagueManager{
 	void deleteClub(int index);
 	void viewClub(int index);
 	void displayTable();
-	void addMatch(LocalDate dateL, SportsClub oneClub, int oneClubScore, SportsClub twoClub, int twoClubScore);
+	Match addMatch(LocalDate dateL, SportsClub oneClub, int oneClubScore, SportsClub twoClub, int twoClubScore);
 	void save();
 	void load();
 }
