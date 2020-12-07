@@ -1,5 +1,6 @@
 package Model;
 
+import Model.*;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -137,6 +138,7 @@ public class GuiJavaFx extends Application {
         Button sortGoals = new Button("Goals");
         sortGoals.setOnAction(event -> {
             Collections.sort(clublistData, new SortbyGoals());
+            Collections.reverse(clublistData);
             clubTable.setItems(dataToTable(clublistData));
         });
         AnchorPane.setLeftAnchor(sortGoals,20d);
@@ -145,6 +147,7 @@ public class GuiJavaFx extends Application {
         Button sortWins = new Button("Wins");
         sortWins.setOnAction(event -> {
             Collections.sort(clublistData, new SortbyWins());
+            Collections.reverse(clublistData);
             clubTable.setItems(dataToTable(clublistData));
         });
         AnchorPane.setLeftAnchor(sortWins,90d);
@@ -153,6 +156,7 @@ public class GuiJavaFx extends Application {
         Button sortPoints = new Button("Reset");
         sortPoints.setOnAction(event -> {
             Collections.sort(clublistData, new SortByPoints());
+            Collections.reverse(clublistData);
             clubTable.setItems(dataToTable(clublistData));
         });
         AnchorPane.setLeftAnchor(sortPoints,160d);
