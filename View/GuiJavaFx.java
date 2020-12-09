@@ -27,6 +27,7 @@ public class GuiJavaFx extends Application {
     public void update(){
         Serialize load = new Serialize();
         ArrayList <Object> deserialized = load.deserialize();
+
         clublistData = (List<SportsClub>) deserialized.get(0);
         matchlistData= (List<Match>) deserialized.get(1);
     }
@@ -44,8 +45,6 @@ public class GuiJavaFx extends Application {
         return table;
     }
     public TableView<SportsClub> clubstable(){
-//        TODO
-//        Collections.sort(clublistData, new SortByPoints());
 
         TableView<SportsClub> clubTable = new TableView<>();
         TableColumn<SportsClub,String> clubName = new TableColumn<>("Club");
@@ -138,8 +137,7 @@ public class GuiJavaFx extends Application {
 
         Button sortGoals = new Button("Goals");
         sortGoals.setOnAction(event -> {
-//            TODO
-//            Collections.sort(clublistData, new SortbyGoals());
+            clublistData.sort((SportsClub::sortGoal));
             Collections.reverse(clublistData);
             clubTable.setItems(dataToTable(clublistData));
         });
@@ -148,8 +146,7 @@ public class GuiJavaFx extends Application {
 
         Button sortWins = new Button("Wins");
         sortWins.setOnAction(event -> {
-//            TODO
-//            Collections.sort(clublistData, new SortbyWins());
+            clublistData.sort((SportsClub::sortWins));
             Collections.reverse(clublistData);
             clubTable.setItems(dataToTable(clublistData));
         });
@@ -158,8 +155,7 @@ public class GuiJavaFx extends Application {
 
         Button sortPoints = new Button("Reset");
         sortPoints.setOnAction(event -> {
-//            TODO
-//            Collections.sort(clublistData, new SortByPoints());
+            clublistData.sort((SportsClub::sortPointsGoal));
             Collections.reverse(clublistData);
             clubTable.setItems(dataToTable(clublistData));
         });
@@ -174,10 +170,8 @@ public class GuiJavaFx extends Application {
         genMatch.setOnAction(event -> {
             genarateMatch();
             update();
-//            TODO
-//            Collections.sort(clublistData, new SortByPoints());
+            clublistData.sort((SportsClub::sortPointsGoal));
             clubTable.setItems(dataToTable(clublistData));
-
         });
 
         Label title = new Label("Club Details");
