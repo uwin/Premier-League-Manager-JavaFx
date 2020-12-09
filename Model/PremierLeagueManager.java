@@ -19,8 +19,6 @@ public class PremierLeagueManager implements LeagueManager{
 		}return instance;
 	}
 
-	public static void main(String[]args) {}
-
 	@Override
 	public void createClub(String name, String location) {
 		SportsClub newClub = new FootballClub(name,location);
