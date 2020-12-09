@@ -37,26 +37,3 @@ public class FootballClub extends SportsClub {
 				" \ngoalsScored   : " + goalsScored;
 	}
 }
-class SortbyPointGoals implements Comparator<SportsClub>
-{
-	public int compare(SportsClub a, SportsClub b)
-	{ if (a.getPointCount()==b.getPointCount()){
-		return ((FootballClub)(a)).getGoalsScored()-((FootballClub)(b)).getGoalsScored();
-	}else return a.getPointCount()-b.getPointCount();
-	}
-}
-class SortbyGoals implements Comparator<SportsClub>
-{
-	public int compare(SportsClub a, SportsClub b)
-	{ return ((FootballClub)(a)).getGoalsScored()-((FootballClub)(b)).getGoalsScored(); }
-}
-class SortbyWins implements Comparator<SportsClub>
-{
-	public int compare(SportsClub a, SportsClub b)
-	{ return a.getWins()-b.getWins(); }
-}
-class SortByPoints implements Comparator<SportsClub>
-{
-	public int compare(SportsClub a, SportsClub b)
-	{ return a.getPointCount()-b.getPointCount(); }
-}
