@@ -1,4 +1,4 @@
-package Model;
+package View;
 
 import Model.*;
 import javafx.application.Application;
@@ -44,7 +44,8 @@ public class GuiJavaFx extends Application {
         return table;
     }
     public TableView<SportsClub> clubstable(){
-        Collections.sort(clublistData, new SortByPoints());
+//        TODO
+//        Collections.sort(clublistData, new SortByPoints());
 
         TableView<SportsClub> clubTable = new TableView<>();
         TableColumn<SportsClub,String> clubName = new TableColumn<>("Club");
@@ -137,7 +138,8 @@ public class GuiJavaFx extends Application {
 
         Button sortGoals = new Button("Goals");
         sortGoals.setOnAction(event -> {
-            Collections.sort(clublistData, new SortbyGoals());
+//            TODO
+//            Collections.sort(clublistData, new SortbyGoals());
             Collections.reverse(clublistData);
             clubTable.setItems(dataToTable(clublistData));
         });
@@ -146,7 +148,8 @@ public class GuiJavaFx extends Application {
 
         Button sortWins = new Button("Wins");
         sortWins.setOnAction(event -> {
-            Collections.sort(clublistData, new SortbyWins());
+//            TODO
+//            Collections.sort(clublistData, new SortbyWins());
             Collections.reverse(clublistData);
             clubTable.setItems(dataToTable(clublistData));
         });
@@ -155,7 +158,8 @@ public class GuiJavaFx extends Application {
 
         Button sortPoints = new Button("Reset");
         sortPoints.setOnAction(event -> {
-            Collections.sort(clublistData, new SortByPoints());
+//            TODO
+//            Collections.sort(clublistData, new SortByPoints());
             Collections.reverse(clublistData);
             clubTable.setItems(dataToTable(clublistData));
         });
@@ -170,7 +174,8 @@ public class GuiJavaFx extends Application {
         genMatch.setOnAction(event -> {
             genarateMatch();
             update();
-            Collections.sort(clublistData, new SortByPoints());
+//            TODO
+//            Collections.sort(clublistData, new SortByPoints());
             clubTable.setItems(dataToTable(clublistData));
 
         });
