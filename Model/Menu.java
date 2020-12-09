@@ -120,9 +120,7 @@ public class Menu{
             pause();
             return;
         }
-//        TODO
-//        Collections.sort(clubList,byPointCount());
-
+        Collections.sort(clubList,(SportsClub::sortPointsGoal));
         Collections.reverse(clubList);
         String sFormat = "|%1$-16s|%2$-10s|%3$-10s|%4$-10s|%5$-10s|%6$-10s|\n";
         System.out.format(sFormat,"Name","Points","Goals","Wins","Loss","Matches");

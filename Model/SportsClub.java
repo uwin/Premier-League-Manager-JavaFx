@@ -59,4 +59,19 @@ public abstract class  SportsClub implements Serializable{
 				" \npointCount    : " + pointCount +
 				" \nmatchCount    : " + matchCount;
 			}
-}	
+
+	public static <T> int sortPointsGoal(SportsClub t, SportsClub t1) {
+		if (t.getPointCount()==t1.getPointCount()){
+			return ((FootballClub)(t)).getGoalsScored()-((FootballClub)(t1)).getGoalsScored();
+		}else return t.getPointCount()-t1.getPointCount();
+	}
+	public static <T> int sortGoal(SportsClub t, SportsClub t1) {
+		return ((FootballClub)(t)).getGoalsScored()-((FootballClub)(t1)).getGoalsScored();
+	}
+	public static <T> int sortWins(SportsClub t, SportsClub t1) {
+		return t.getWins()-t1.getWins();
+	}
+	public static <T> int sortPoints(SportsClub t, SportsClub t1) {
+		return t.getPointCount()-t1.getPointCount();
+	}
+}
