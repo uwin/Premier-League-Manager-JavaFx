@@ -155,7 +155,7 @@ public class GuiJavaFx extends Application {
 
         Button sortPoints = new Button("Reset");
         sortPoints.setOnAction(event -> {
-            clublistData.sort((SportsClub::sortPointsGoal));
+            clublistData.sort((SportsClub::sortPoints));
             Collections.reverse(clublistData);
             clubTable.setItems(dataToTable(clublistData));
         });
