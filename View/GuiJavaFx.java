@@ -21,7 +21,7 @@ import java.util.Random;
 public class GuiJavaFx extends Application {
     List<SportsClub> clublistData;
     List<Match> matchlistData;
-    private boolean state=false;
+    private boolean state=true;
 
 
     public void update(){
@@ -39,9 +39,9 @@ public class GuiJavaFx extends Application {
         clubTableScreen(window);
     }
 
-    public ObservableList dataToTable(List clubList){
+    public ObservableList dataToTable(List listIn){
         ObservableList table = FXCollections.observableArrayList();
-        table.addAll(clubList);
+        table.addAll(listIn);
         return table;
     }
     public TableView<SportsClub> clubstable(){
@@ -155,7 +155,7 @@ public class GuiJavaFx extends Application {
 
         Button sortPoints = new Button("Reset");
         sortPoints.setOnAction(event -> {
-            clublistData.sort((SportsClub::sortPoints));
+            clublistData.sort((SportsClub::sortPointsGoal));
             Collections.reverse(clublistData);
             clubTable.setItems(dataToTable(clublistData));
         });
@@ -171,6 +171,7 @@ public class GuiJavaFx extends Application {
             genarateMatch();
             update();
             clublistData.sort((SportsClub::sortPointsGoal));
+            Collections.reverse(clublistData);
             clubTable.setItems(dataToTable(clublistData));
         });
 
@@ -184,14 +185,15 @@ public class GuiJavaFx extends Application {
         AnchorPane.setRightAnchor(switchtable,200d);
         AnchorPane.setBottomAnchor(switchtable,20d);
         switchtable.setOnAction(event -> {
-
+            System.out.println("state = " + state);
             if (state){
-                clubTableScreen(window);
-                window.show();
-            }else {
                 matchTableScreen(window);
-                window.show();
+                state=false;
+            }else {
+                clubTableScreen(window);
+                state=true;
             }
+            window.show();
         });
         first.getChildren().addAll(sortGoals,sortWins,sortPoints,clubTable,title,switchtable,genMatch);
         window.show();
@@ -230,10 +232,13 @@ public class GuiJavaFx extends Application {
         AnchorPane.setRightAnchor(switchtable,200d);
         AnchorPane.setBottomAnchor(switchtable,20d);
         switchtable.setOnAction(event -> {
-            if (!state){
-                clubTableScreen(window);
-            }else {
+            System.out.println("state = " + state);
+            if (state){
                 matchTableScreen(window);
+                state=false;
+            }else {
+                clubTableScreen(window);
+                state=true;
             }
             window.show();
         });
@@ -246,10 +251,18 @@ public class GuiJavaFx extends Application {
         return (int) (Math.random() * ((20 - 1) + 1)) + 1;
     }
     public int generateTeam(){
-        return (int) (Math.random() * (clublistData.size() - 1)+1);
+        return (int) (Math.random() * (clublistData.size())+1);
     }
     public void genarateMatch() {
         PremierLeagueManager club = PremierLeagueManager.getInstance();
+
+        if (clublistData.size()<2){
+            Alert a = new Alert(Alert.AlertType.WARNING);
+            a.setHeaderText("Not Enough Clubs ");
+            a.setContentText("you need more 2 or more clubs to genarate teams");
+            a.showAndWait();
+            return;
+        }
 
 //            date
         LocalDate start = LocalDate.of(2020, Month.JANUARY, 1);
