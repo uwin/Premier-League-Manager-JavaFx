@@ -1,6 +1,6 @@
 package Model;
 
-import java.util.Comparator;
+
 public class FootballClub extends SportsClub {
 	private int goalsReceived;
 	private int goalsScored;

@@ -24,7 +24,7 @@ public class Serialize implements Serializable {
 	}
 	public ArrayList<Object> deserialize() {
 		ArrayList <Object> deserialized = null;
-		PremierLeagueManager club = PremierLeagueManager.getInstance();
+
 
 		try(FileInputStream fileIn = new FileInputStream("data.ser");
 			ObjectInputStream in = new ObjectInputStream(fileIn)

@@ -120,7 +120,7 @@ public class Menu{
             pause();
             return;
         }
-        Collections.sort(clubList,(SportsClub::sortPointsGoal));
+        clubList.sort((SportsClub::sortPointsGoal));
         Collections.reverse(clubList);
         String sFormat = "|%1$-16s|%2$-10s|%3$-10s|%4$-10s|%5$-10s|%6$-10s|\n";
         System.out.format(sFormat,"Name","Points","Goals","Wins","Loss","Matches");
@@ -131,7 +131,7 @@ public class Menu{
     public void addMatch() {
 
     	List<SportsClub> clubList = club.getClubList();
-    	List<Match> matchList = club.getMatchList();
+
 
     	if(clubList.size()<=1){
             System.out.print("you need atleast 2 club to add a match");
@@ -176,7 +176,7 @@ public class Menu{
 
         System.out.println("enter Score for "+oneClub.getName());
         while (!sc.hasNextInt()){
-            String  b = sc.next();
+            String  checkNum = sc.next();
             System.out.println("enter in number");
         }
         int oneClubScore = sc.nextInt();
@@ -184,7 +184,7 @@ public class Menu{
 
         System.out.println("enter Score for "+twoClub.getName());
         while (!sc.hasNextInt()){
-            String  b = sc.next();
+            String  checkNum = sc.next();
             System.out.println("enter in number");
         }
         int twoClubScore = sc.nextInt();
