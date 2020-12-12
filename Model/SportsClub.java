@@ -12,17 +12,8 @@ public abstract class  SportsClub implements Serializable{
 	int matchCount;
 
 	public SportsClub(){}
+	
 
-	public SportsClub(String name, String location, int wins, int draws, int defeat, int score, int pointCount, int matchCount) {
-		this.name = name;
-		this.location = location;
-		this.wins = wins;
-		this.draws = draws;
-		this.defeat = defeat;
-		this.score = score;
-		this.pointCount = pointCount;
-		this.matchCount = matchCount;
-	}
 
 	public String getName() { return name; }
 	public void setName(String name) { this.name=name;	}
