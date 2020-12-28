@@ -70,7 +70,7 @@ public class Menu{
         Scanner sc = new Scanner(System.in);
 
         System.out.println("Enter Name for Club");
-        String name = sc.nextLine();
+        String name = sc.nextLine().toLowerCase();
 
         for(SportsClub clubLoop: clubList){
             if (clubLoop.getName().equalsIgnoreCase(name)){

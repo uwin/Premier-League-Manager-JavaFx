@@ -84,11 +84,11 @@ public class PremierLeagueManager implements LeagueManager{
 	@Override
 	public void load() {
 		Serialize load = new Serialize();
-		ArrayList <Object> deserialized = load.deserialize();
+		ArrayList <ArrayList> deserialized = load.deserialize();
 
 		if (deserialized!=null) {
-			setClubList((List<SportsClub>) deserialized.get(0));
-			setMatchList((List<Match>) deserialized.get(1));
+			setClubList(deserialized.get(0));
+			setMatchList(deserialized.get(1));
 		}
 	}
 
@@ -97,11 +97,11 @@ public class PremierLeagueManager implements LeagueManager{
 	}
 	public List<Match> getMatchList() { return matchList; }
 
-	public static void setClubList(List<SportsClub> clubList) {
+	public static void setClubList(ArrayList<SportsClub> clubList) {
 		PremierLeagueManager.clubList = clubList;
 	}
 
-	public static void setMatchList(List<Match> matchList) {
+	public static void setMatchList(ArrayList<Match> matchList) {
 		PremierLeagueManager.matchList = matchList;
 	}
 }

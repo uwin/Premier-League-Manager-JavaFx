@@ -26,7 +26,7 @@ public class GuiJavaFx extends Application {
 
     public void update(){
         Serialize load = new Serialize();
-        ArrayList <Object> deserialized = load.deserialize();
+        ArrayList<ArrayList> deserialized = load.deserialize();
 
         clublistData = (List<SportsClub>) deserialized.get(0);
         matchlistData= (List<Match>) deserialized.get(1);
