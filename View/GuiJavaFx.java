@@ -12,6 +12,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,23 +96,23 @@ public class GuiJavaFx extends Application {
 
         TableView<SportsClub> matchTable = new TableView<>();
         TableColumn<SportsClub,String> matchDate = new TableColumn<>("Date");
-        matchDate.setMinWidth(80);
+        matchDate.setMinWidth(128);
         matchDate.setCellValueFactory(new PropertyValueFactory<>("date"));
 
         TableColumn<SportsClub,String> teamAName = new TableColumn<>("Team A");
-        teamAName.setMinWidth(80);
+        teamAName.setMinWidth(128);
         teamAName.setCellValueFactory(new PropertyValueFactory<>("teamAName"));
 
         TableColumn<SportsClub,String> teamAScore = new TableColumn<>("Score");
-        teamAScore.setMinWidth(80);
+        teamAScore.setMinWidth(128);
         teamAScore.setCellValueFactory(new PropertyValueFactory<>("teamAScore"));
 
         TableColumn<SportsClub,String> teamBName = new TableColumn<>("Team B");
-        teamBName.setMinWidth(80);
+        teamBName.setMinWidth(128);
         teamBName.setCellValueFactory(new PropertyValueFactory<>("teamBName"));
 
         TableColumn<SportsClub,String> teamBScore = new TableColumn<>("Score");
-        teamBScore.setMinWidth(80);
+        teamBScore.setMinWidth(128);
         teamBScore.setCellValueFactory(new PropertyValueFactory<>("teamBScore"));
 
 
@@ -182,7 +183,7 @@ public class GuiJavaFx extends Application {
 
 
         Button switchtable = new Button("switch table");
-        AnchorPane.setRightAnchor(switchtable,200d);
+        AnchorPane.setRightAnchor(switchtable,110d);
         AnchorPane.setBottomAnchor(switchtable,20d);
         switchtable.setOnAction(event -> {
             System.out.println("state = " + state);
@@ -227,9 +228,44 @@ public class GuiJavaFx extends Application {
         AnchorPane.setTopAnchor(title,20d);
         AnchorPane.setLeftAnchor(title, 20d);
 
+        Button resetButton = new Button("R");
+        AnchorPane.setTopAnchor(resetButton,20d);
+        AnchorPane.setRightAnchor(resetButton, 50d);
+        resetButton.setOnAction(event -> {
+            clubTable.setItems(dataToTable(matchlistData));
+        });
+
+        TextField dateInput = new TextField("YYYY-MM-DD");
+//        dateInput.setStyle("-fx-font: 20 arial;");
+        AnchorPane.setTopAnchor(dateInput,20d);
+        AnchorPane.setRightAnchor(dateInput, 80d);
+
+        Button searchButton = new Button("Q");
+        AnchorPane.setTopAnchor(searchButton,20d);
+        AnchorPane.setRightAnchor(searchButton, 20d);
+        searchButton.setOnAction(event -> {
+            Alert a = new Alert(Alert.AlertType.WARNING);
+            a.setHeaderText("enter a valid Date");
+            if (dateInput.getText().trim().isEmpty()){
+                a.setContentText("Feild is empty");
+                a.show();
+            }else
+                {
+                    DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-M-d");
+                    try {
+                        LocalDate dateIn = LocalDate.parse(dateInput.getText(), dateFormat);
+                        searchByDate(dateIn);
+                        clubTable.setItems(dataToTable(searchByDate(dateIn)));
+                    } catch (Exception ex) {
+                        a.setContentText("use the YYYY-MM-DD format");
+                        a.show();
+                    }
+                }
+        });
+
 
         Button switchtable = new Button("switch table");
-        AnchorPane.setRightAnchor(switchtable,200d);
+        AnchorPane.setRightAnchor(switchtable,110d);
         AnchorPane.setBottomAnchor(switchtable,20d);
         switchtable.setOnAction(event -> {
             System.out.println("state = " + state);
@@ -243,7 +279,7 @@ public class GuiJavaFx extends Application {
             window.show();
         });
 
-        first.getChildren().addAll(clubTable,title,switchtable,genMatch);
+        first.getChildren().addAll(clubTable,title,switchtable,genMatch,dateInput,searchButton,resetButton);
         window.show();
     }
 
@@ -291,5 +327,14 @@ public class GuiJavaFx extends Application {
                         "\nTeam B Score :"+twoClubScore+
                         "\nDate : "+randomDate);
         a.showAndWait();
+    }
+    public List<Match> searchByDate(LocalDate dateIn){
+        List<Match> searchArray = new ArrayList<>();
+        for (Match match :matchlistData){
+            if (match.getDate().toString().equals(dateIn.toString())){
+                searchArray.add(match);
+            }
+        }
+        return searchArray;
     }
 }
