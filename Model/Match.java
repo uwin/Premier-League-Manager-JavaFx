@@ -7,8 +7,10 @@ public class Match implements Serializable {
 	private LocalDate date;
 	private FootballClub teamA;
 	private int teamAScore;
+	private String teamAName;
 	private FootballClub teamB;
 	private int teamBScore;
+	private String teamBName;
 
 	public Match(){ }
 
@@ -26,6 +28,13 @@ public class Match implements Serializable {
 
 	public void setTeamA(FootballClub teamA) {
 		this.teamA = teamA;
+	}
+	public String getTeamAName() {
+		return this.teamA.getName();
+	}
+
+	public void setTeamAName(String teamAName) {
+		this.teamAName = teamAName;
 	}
 
 	public int getTeamAScore() {
@@ -50,6 +59,13 @@ public class Match implements Serializable {
 
 	public void setTeamB(FootballClub teamB) {
 		this.teamB = teamB;
+	}
+	public String getTeamBName() {
+		return this.teamB.getName();
+	}
+
+	public void setTeamBName(String teamBName) {
+		this.teamBName = teamBName;
 	}
 
 	@Override

@@ -98,17 +98,17 @@ public class GuiJavaFx extends Application {
         matchDate.setMinWidth(80);
         matchDate.setCellValueFactory(new PropertyValueFactory<>("date"));
 
-        TableColumn<SportsClub,String> teamA = new TableColumn<>("Team A");
-        teamA.setMinWidth(80);
-        teamA.setCellValueFactory(new PropertyValueFactory<>("teamA.name"));
+        TableColumn<SportsClub,String> teamAName = new TableColumn<>("Team A");
+        teamAName.setMinWidth(80);
+        teamAName.setCellValueFactory(new PropertyValueFactory<>("teamAName"));
 
         TableColumn<SportsClub,String> teamAScore = new TableColumn<>("Score");
         teamAScore.setMinWidth(80);
         teamAScore.setCellValueFactory(new PropertyValueFactory<>("teamAScore"));
 
-        TableColumn<SportsClub,String> teamB = new TableColumn<>("Team B");
-        teamB.setMinWidth(80);
-        teamB.setCellValueFactory(new PropertyValueFactory<>("teamB.name"));
+        TableColumn<SportsClub,String> teamBName = new TableColumn<>("Team B");
+        teamBName.setMinWidth(80);
+        teamBName.setCellValueFactory(new PropertyValueFactory<>("teamBName"));
 
         TableColumn<SportsClub,String> teamBScore = new TableColumn<>("Score");
         teamBScore.setMinWidth(80);
@@ -117,9 +117,9 @@ public class GuiJavaFx extends Application {
 
         matchTable.setItems(dataToTable(matchlistData));
         matchTable.getColumns().add(matchDate);
-        matchTable.getColumns().add(teamA);
+        matchTable.getColumns().add(teamAName);
         matchTable.getColumns().add(teamAScore);
-        matchTable.getColumns().add(teamB);
+        matchTable.getColumns().add(teamBName);
         matchTable.getColumns().add(teamBScore);
         return matchTable;
     }
@@ -251,7 +251,7 @@ public class GuiJavaFx extends Application {
         return (int) (Math.random() * ((20 - 1) + 1)) + 1;
     }
     public int generateTeam(){
-        return (int) (Math.random() * (clublistData.size())+1);
+        return (int) (Math.random() * (clublistData.size()));
     }
     public void genarateMatch() {
         PremierLeagueManager club = PremierLeagueManager.getInstance();
