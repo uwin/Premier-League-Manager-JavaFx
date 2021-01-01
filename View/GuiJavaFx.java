@@ -33,11 +33,18 @@ public class GuiJavaFx extends Application {
         matchlistData= (List<Match>) deserialized.get(1);
     }
 
+    public static void main(String[] args) {
+        run();
+    }
     @Override
     public void start(Stage primaryStage) {
         Stage window = new Stage();
         window.setTitle("Premier League");
         clubTableScreen(window);
+    }
+
+    public static void run() {
+        launch();
     }
 
     public ObservableList dataToTable(List listIn){

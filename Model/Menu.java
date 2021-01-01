@@ -1,5 +1,7 @@
 package Model;
 
+import View.GuiJavaFx;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,9 +13,34 @@ public class Menu{
     PremierLeagueManager club = PremierLeagueManager.getInstance();
 
 	public static void main(String [] args){
-        Menu begin = new Menu();
-        begin.load();
-        begin.menuCli();
+        Scanner sc = new Scanner(System.in);
+        System.out.println(" --------------------------------");
+        System.out.println(" 1 | Launch Cli");
+        System.out.println(" 2 | Launch JavaFx");
+        System.out.println(" 3 | Launch Angular/Playframework");
+        System.out.println(" 4 | Exit");
+        System.out.println(" --------------------------------");
+        System.out.println("Select Option");
+        String selection;
+        selection = sc.next();
+
+        switch (selection){
+            case "1":
+                Menu begin = new Menu();
+                begin.load();
+                begin.menuCli();
+                break;
+            case "2":
+                GuiJavaFx.run();
+                break;
+            case "3":
+                System.out.println("3");
+                break;
+            case "4": ;
+                System.out.println("4");
+                break;
+        }
+
 	}
     public void menuCli (){
         Scanner sc = new Scanner(System.in);
