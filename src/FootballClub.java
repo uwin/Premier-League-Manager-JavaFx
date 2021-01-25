@@ -1,6 +1,3 @@
-package Model;
-
-
 public class FootballClub extends SportsClub {
 	private int goalsReceived;
 	private int goalsScored;

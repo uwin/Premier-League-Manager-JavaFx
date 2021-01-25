@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="354.0" y="1173.0">com</node>
+    <node x="268.0" y="684.0">SchoolFootballClubs</node>
+    <node x="261.0" y="1076.0">netscape</node>
+    <node x="671.0" y="1076.0">oracle</node>
+    <node x="184.0" y="805.0">Serialize</node>
+    <node x="519.0" y="1173.0">org</node>
+    <node x="0.0" y="684.0">UniversityFootballClub</node>
+    <node x="157.25" y="430.0">FootballClub</node>
+    <node x="684.0" y="1173.0">sun</node>
+    <node x="0.0" y="805.0">Match</node>
+    <node x="466.0" y="1076.0">META-INF</node>
+    <node x="849.0" y="1173.0">jdk</node>
+    <node x="550.0" y="0.0">LeagueManager</node>
+    <node x="0.0" y="1076.0">groovyjarjarasm</node>
+    <node x="181.0" y="1173.0">java</node>
+    <node x="860.0" y="1076.0">groovy</node>
+    <node x="0.0" y="1173.0">javax</node>
+    <node x="519.0" y="805.0">groovyjarjarcommonscli</node>
+    <node x="118.75" y="0.0">SportsClub</node>
+    <node x="1049.0" y="1076.0">javafx</node>
+    <node x="963.0" y="0.0">Menu</node>
+    <node x="836.0" y="805.0">groovyjarjarantlr</node>
+    <node x="550.0" y="236.0">PremierLeagueManager</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="UniversityFootballClub" target="FootballClub">
+      <point x="0.0" y="-38.0" />
+      <point x="124.0" y="659.0" />
+      <point x="206.25" y="659.0" />
+      <point x="-49.0" y="102.0" />
+    </edge>
+    <edge source="FootballClub" target="SportsClub">
+      <point x="0.0" y="-102.0" />
+      <point x="0.0" y="190.0" />
+    </edge>
+    <edge source="PremierLeagueManager" target="LeagueManager">
+      <point x="0.0" y="-200.0" />
+      <point x="0.0" y="93.0" />
+    </edge>
+    <edge source="SchoolFootballClubs" target="FootballClub">
+      <point x="0.0" y="-38.0" />
+      <point x="386.5" y="659.0" />
+      <point x="304.25" y="659.0" />
+      <point x="49.0" y="102.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="337.6388888888889" y="488.6111111111112" />
+  <SelectedNodes>
+    <node>SportsClub</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Constructors</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

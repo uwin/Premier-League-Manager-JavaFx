@@ -1,5 +1,3 @@
-package Model;
-
 public class SchoolFootballClubs extends FootballClub {
 
 	public SchoolFootballClubs() {
