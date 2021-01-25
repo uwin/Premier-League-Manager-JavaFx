@@ -1,0 +1,1528 @@
+Index: src/Menu.java
+===================================================================
+--- src/Menu.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ src/Menu.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
+@@ -1,220 +0,0 @@
+-import java.time.LocalDate;
+-import java.time.format.DateTimeFormatter;
+-import java.util.ArrayList;
+-import java.util.List;
+-import java.util.Scanner;
+-import java.util.Collections;
+-
+-public class Menu{
+-    PremierLeagueManager club = PremierLeagueManager.getInstance();
+-
+-	public static void main(String [] args){
+-        Menu begin = new Menu();
+-        begin.load();
+-        begin.menuCli();
+-	}
+-    public void menuCli (){
+-        Scanner sc = new Scanner(System.in);
+-        System.out.println(" --------------------------------");
+-        System.out.println(" 1 | Create Football club");
+-        System.out.println(" 2 | Delete Football club");
+-        System.out.println(" 3 | Display statistics");
+-        System.out.println(" 4 | Display Premier league Table");
+-        System.out.println(" 5 | Played match");
+-        System.out.println(" 6 | Exit");
+-        System.out.println(" --------------------------------");
+-        System.out.println("Select Option");
+-        String selection;
+-        selection = sc.next();
+-
+-        switch (selection){
+-            case "1":
+-                createClub();
+-                pause();
+-                break;
+-            case "2":
+-                deleteClub();
+-                pause();
+-                break;
+-            case "3":
+-                viewClub();
+-                pause();
+-                break;
+-            case "4":
+-                displayTable();
+-                pause();
+-                break;
+-            case "5":
+-                addMatch();
+-                pause();
+-                break;
+-            case "6":
+-                save();
+-                System.exit(0);
+-            default:
+-                menuCli();
+-                break;
+-        }
+-    }
+-    public void pause(){
+-	    Scanner sc = new Scanner(System.in);
+-	    System.out.print("\ncontinue... (press any key) ");
+-	    String in = sc.next();
+-	    if (!in.isEmpty()) menuCli();
+-    }
+-
+-    public void createClub() {
+-        List <SportsClub> clubList = club.getClubList();
+-        Scanner sc = new Scanner(System.in);
+-
+-        System.out.println("Enter Name for Club");
+-        String name = sc.nextLine().toLowerCase();
+-
+-        for(SportsClub clubLoop: clubList){
+-            if (clubLoop.getName().equalsIgnoreCase(name)){
+-                System.out.println("the Club already exists");
+-                createClub();
+-                return;
+-            }
+-        }
+-
+-        System.out.println("Enter Location for Club");
+-        String location = sc.nextLine();
+-
+-        club.createClub(name,location);
+-        System.out.println("----|");
+-        System.out.println("Added club : "+ name);
+-        System.out.println("----|");
+-    }
+-    public void deleteClub() {
+-        List <SportsClub> clubList = club.getClubList();
+-        System.out.println("Select Name for Club");
+-        int selectedClub = SelectTeam();
+-        String Name = clubList.get(selectedClub).getName();
+-
+-        club.deleteClub(selectedClub);
+-        System.out.println("----|");
+-        System.out.println("Deleted club : "+Name);
+-        System.out.println("----|");
+-
+-    }
+-    public void viewClub() {
+-    	List <SportsClub> clubList = club.getClubList();
+-
+-	    if(clubList.size()<=0){
+-            System.out.println("no clubs in league");
+-            pause();
+-		    return;
+-	    }
+-        System.out.println("Select Name for Club");
+-        club.viewClub(SelectTeam());
+-
+-    }
+-    public void displayTable() {
+-
+-        List <SportsClub> clubList=club.getClubList();
+-        if(clubList.size()<=0){
+-            System.out.println("no clubs in league");
+-            pause();
+-            return;
+-        }
+-        clubList.sort((SportsClub::sortPointsGoal));
+-        Collections.reverse(clubList);
+-        String sFormat = "|%1$-16s|%2$-10s|%3$-10s|%4$-10s|%5$-10s|%6$-10s|\n";
+-        System.out.format(sFormat,"Name","Points","Goals","Wins","Loss","Matches");
+-        for (SportsClub l: clubList){
+-            System.out.format(sFormat,l.getName(),l.getPointCount(),((FootballClub)l).getGoalsScored(),l.getWins(),l.getDefeat(),l.getMatchCount());
+-        }
+-    }
+-    public void addMatch() {
+-
+-    	List<SportsClub> clubList = club.getClubList();
+-
+-
+-    	if(clubList.size()<=1){
+-            System.out.print("you need atleast 2 club to add a match");
+-            pause();
+-            return;
+-        }
+-
+-    	Scanner sct = new Scanner(System.in);
+-
+-        System.out.println("Enter date [DD/MM/YYYY]: ");
+-        String line = sct.nextLine();
+-        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("d/M/yyyy");
+-        LocalDate dateL;
+-        while(true){
+-        try {
+-            dateL = LocalDate.parse(line, dateFormat);
+-            break;
+-        } catch (Exception ex) {
+-            System.out.println("incorrect format, try again");
+-            line = sct.nextLine();
+-            }
+-        }
+-
+-
+-        System.out.println(" --------------------------------");
+-        System.out.println("select First club name");
+-        SportsClub oneClub = clubList.get(SelectTeam());
+-		
+-		System.out.println(" --------------------------------");
+-        System.out.println("select Second club name");
+-        SportsClub twoClub = clubList.get(SelectTeam());
+-        
+-
+-        while (oneClub==twoClub){
+-        	System.out.println(" --------------------------------");
+-            System.out.println("| >|Select a different team|< |");
+-            twoClub = clubList.get(SelectTeam());
+-
+-        }
+-
+-        Scanner sc = new Scanner(System.in);
+-
+-        System.out.println("enter Score for "+oneClub.getName());
+-        while (!sc.hasNextInt()){
+-            String  checkNum = sc.next();
+-            System.out.println("enter in number");
+-        }
+-        int oneClubScore = sc.nextInt();
+-
+-
+-        System.out.println("enter Score for "+twoClub.getName());
+-        while (!sc.hasNextInt()){
+-            String  checkNum = sc.next();
+-            System.out.println("enter in number");
+-        }
+-        int twoClubScore = sc.nextInt();
+-
+-        club.addMatch(dateL,oneClub,oneClubScore,twoClub,twoClubScore);
+-        save();
+-    }
+-    public void save()  {
+-        club.save();
+-    }
+-    public void load() {
+-	    club.load();
+-    }
+-
+-    public int SelectTeam (){
+-        ArrayList <String> tempMenu = new ArrayList<>();
+-        Scanner sc = new Scanner(System.in);
+-        int i=0;
+-
+-        List<SportsClub>  clubList=club.getClubList();
+-        for (SportsClub l: clubList){
+-            System.out.println(i +"| "+ l.getName());
+-            tempMenu.add(String.valueOf(i));
+-            i++;
+-        }
+-        String selectClub = sc.next();
+-        while(!tempMenu.contains(selectClub)){
+-        	System.out.println("wrong input");
+-            selectClub = sc.next();
+-            System.out.println(selectClub);
+-        }
+-	    return Integer.parseInt(selectClub);
+-    }
+-
+-}
+\ No newline at end of file
+Index: .idea/Premier League.iml
+===================================================================
+--- .idea/Premier League.iml	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ .idea/Premier League.iml	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
+@@ -1,11 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<module type="JAVA_MODULE" version="4">
+-  <component name="NewModuleRootManager" inherit-compiler-output="true">
+-    <exclude-output />
+-    <content url="file://$MODULE_DIR$">
+-      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+-    </content>
+-    <orderEntry type="inheritedJdk" />
+-    <orderEntry type="sourceFolder" forTests="false" />
+-  </component>
+-</module>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_1_3_2021_12_04_AM_[Default_Changelist]/shelved.patch
+===================================================================
+--- .idea/shelf/Uncommitted_changes_before_Checkout_at_1_3_2021_12_04_AM_[Default_Changelist]/shelved.patch	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ .idea/shelf/Uncommitted_changes_before_Checkout_at_1_3_2021_12_04_AM_[Default_Changelist]/shelved.patch	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
+@@ -1,29 +0,0 @@
+-Index: data.ser
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>��\u0000\u0005sr\u0000\u0013java.util.ArrayListx��\u001D��a�\u0003\u0000\u0001I\u0000\u0004sizexp\u0000\u0000\u0000\u0002w\u0004\u0000\u0000\u0000\u0002sq\u0000~\u0000\u0000\u0000\u0000\u0000\u0002w\u0004\u0000\u0000\u0000\u0002sr\u0000\u0012Model.FootballClubL��<�g�1\u0002\u0000\u0002I\u0000\rgoalsReceivedI\u0000\u000BgoalsScoredxr\u0000\u0010Model.SportsClub�ox�z\u001B\n�\u0002\u0000\bI\u0000\u0006defeatI\u0000\u0005drawsI\u0000\nmatchCountI\u0000\npointCountI\u0000\u0005scoreI\u0000\u0004winsL\u0000\blocationt\u0000\u0012Ljava/lang/String;L\u0000\u0004nameq\u0000~\u0000\u0005xp\u0000\u0000\u0000\u0012\u0000\u0000\u0000\u0001\u0000\u0000\u0000(\u0000\u0000\u0000@\u0000\u0000\u0001�\u0000\u0000\u0000\u0015t\u0000\u0004testt\u0000\u0005royal\u0000\u0000\u0001r\u0000\u0000\u0001�sq\u0000~\u0000\u0003\u0000\u0000\u0000\u0015\u0000\u0000\u0000\u0001\u0000\u0000\u0000(\u0000\u0000\u00007\u0000\u0000\u0001r\u0000\u0000\u0000\u0012t\u0000\u0005testyt\u0000\u0003iit\u0000\u0000\u0001�\u0000\u0000\u0001rxsq\u0000~\u0000\u0000\u0000\u0000\u0000(w\u0004\u0000\u0000\u0000(sr\u0000\u000BModel.MatchF0�\u007F,�I\t\u0002\u0000\u0007I\u0000\nteamAScoreI\u0000\nteamBScoreL\u0000\u0004datet\u0000\u0015Ljava/time/LocalDate;L\u0000\u0005teamAt\u0000\u0014LModel/FootballClub;L\u0000\tteamANameq\u0000~\u0000\u0005L\u0000\u0005teamBq\u0000~\u0000\u000FL\u0000\tteamBNameq\u0000~\u0000\u0005xp\u0000\u0000\u0000\u0005\u0000\u0000\u0000\u0006sr\u0000\rjava.time.Ser�]��\u001B\"H�\f\u0000\u0000xpw\u0007\u0003\u0000\u0000\u0007�\u0004\u0007xq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\u000F\u0000\u0000\u0000\u0005sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0003\u0004xq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\f\u0000\u0000\u0000\u0003sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\b\nxq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u0007\u0000\u0000\u0000\u0004sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\b\u0006xq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\f\u0000\u0000\u0000\u000Bsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\t\u001Bxq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u0013\u0000\u0000\u0000\u0005sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0006\u001Axq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\r\u0000\u0000\u0000\u000Fsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\f\u0006xq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\u0006\u0000\u0000\u0000\u0004sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\t\txq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\u0006\u0000\u0000\u0000\fsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\t\u0017xq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\t\u0000\u0000\u0000\u0001sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0003\u001Fxq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u0011\u0000\u0000\u0000\u0012sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0006\u0005xq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\u000E\u0000\u0000\u0000\u0005sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0007\u0017xq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u0007\u0000\u0000\u0000\u0005sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0006\u0011xq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u000B\u0000\u0000\u0000\u0007sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\t\u0011xq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\n\u0000\u0000\u0000\bsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0006\nxq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\u000F\u0000\u0000\u0000\u0014sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0001\u0015xq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u0003\u0000\u0000\u0000\tsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\n\u0002xq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\f\u0000\u0000\u0000\rsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0005\u001Bxq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\u0000\u0000\u0000\u0000\nsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0004W\u000B\u000Bxq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u000F\u0000\u0000\u0000\u0006sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0005\u0017xq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\n\u0000\u0000\u0000\fsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0004W\u000B\u000Bxq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\n\u0000\u0000\u0000\u000Esq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0004W\u000B\u000Bxq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u0007\u0000\u0000\u0000\tsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0004W\u000B\u000Bxq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\r\u0000\u0000\u0000\u000Bsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0007\u0007xq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u0004\u0000\u0000\u0000\u0011sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\f\u0012xq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\f\u0000\u0000\u0000\u0004sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\t\u0001xq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\u0007\u0000\u0000\u0000\tsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\t\bxq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u0010\u0000\u0000\u0000\bsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0002\u000Bxq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\r\u0000\u0000\u0000\u000Bsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0002\nxq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u0011\u0000\u0000\u0000\u000Bsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0002\u0015xq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\u0003\u0000\u0000\u0000\u0003sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\f\u001Fxq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\u000B\u0000\u0000\u0000\u0007sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0007\u001Exq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\b\u0000\u0000\u0000\nsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0007\u0006xq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u0007\u0000\u0000\u0000\u0001sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0007\u001Cxq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u0011\u0000\u0000\u0000\u0004sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0004\u001Exq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\u0002\u0000\u0000\u0000\u0006sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0002\u0013xq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u0001\u0000\u0000\u0000\rsq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0006\u0016xq\u0000~\u0000\u0006pq\u0000~\u0000\tpsq\u0000~\u0000\r\u0000\u0000\u0000\n\u0000\u0000\u0000\u0012sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0004\u000Fxq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u0012\u0000\u0000\u0000\u0014sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\u0002\u0017xq\u0000~\u0000\tpq\u0000~\u0000\u0006psq\u0000~\u0000\r\u0000\u0000\u0000\u000E\u0000\u0000\u0000\u0005sq\u0000~\u0000\u0011w\u0007\u0003\u0000\u0000\u0007�\t\bxq\u0000~\u0000\u0006pq\u0000~\u0000\tpxx
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- data.ser	(revision 5455c88711ab2229d6d60977de757671909b2eb4)
+-+++ data.ser	(date 1609575709912)
+-@@ -2,7 +2,7 @@
+- goalsReceivedI goalsScoredxr Model.SportsClub�ox�z
+- � I defeatI drawsI 
+- matchCountI 
+--pointCountI scoreI winsL locationt Ljava/lang/String;L nameq ~ xp         (   @  �   t testt royal  r  �sq ~          (   7  r   t testyt iit  �  rxsq ~     (w   (sr Model.MatchF0�,�I	 I 
+-+pointCountI scoreI winsL locationt Ljava/lang/String;L nameq ~ xp         +   F  �   t testt royal  �  �sq ~          +   :  �   t testyt iit  �  �xsq ~     +w   +sr Model.MatchF0�,�I	 I 
+- teamAScoreI 
+- teamBScoreL datet Ljava/time/LocalDate;L teamAt LModel/FootballClub;L 	teamANameq ~ L teamBq ~ L 	teamBNameq ~ xp      sr 
+- java.time.Ser�]��"H�  xpw  �xq ~ pq ~ 	psq ~ 
+-@@ -59,4 +59,7 @@
+-    
+-    sq ~ w  �xq ~ 	pq ~ psq ~ 
+-       sq ~ w  �xq ~ 	pq ~ psq ~ 
+--      sq ~ w  �	xq ~ pq ~ 	pxx
+-\ No newline at end of file
+-+      sq ~ w  �	xq ~ pq ~ 	psq ~ 
+-+      sq ~ w  �xq ~ 	pq ~ psq ~ 
+-+      sq ~ w  �xq ~ 	pq ~ psq ~ 
+-+      sq ~ w  �xq ~ pq ~ 	pxx
+-\ No newline at end of file
+Index: src/Match.java
+===================================================================
+--- src/Match.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ src/Match.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
+@@ -1,57 +0,0 @@
+-import java.io.Serializable;
+-import java.time.LocalDate;
+-
+-public class Match implements Serializable {
+-	private LocalDate date;
+-	private FootballClub teamA;
+-	private int teamAScore;
+-	private FootballClub teamB;
+-	private int teamBScore;
+-
+-	public Match(){ }
+-
+-	public LocalDate getDate() {
+-		return date;
+-	}
+-
+-	public void setDate(LocalDate date) {
+-		this.date = date;
+-	}
+-
+-	public FootballClub getTeamA() {
+-		return teamA;
+-	}
+-
+-	public void setTeamA(FootballClub teamA) {
+-		this.teamA = teamA;
+-	}
+-
+-	public int getTeamAScore() {
+-		return teamAScore;
+-	}
+-
+-	public void setTeamAScore(int teamAScore) {
+-		this.teamAScore = teamAScore;
+-	}
+-
+-	public int getTeamBScore() {
+-		return teamBScore;
+-	}
+-
+-	public void setTeamBScore(int teamBScore) {
+-		this.teamBScore = teamBScore;
+-	}
+-
+-	public FootballClub getTeamB() {
+-		return teamB;
+-	}
+-
+-	public void setTeamB(FootballClub teamB) {
+-		this.teamB = teamB;
+-	}
+-
+-	@Override
+-	public String toString() {
+-		return  teamA.getName()+"<"+teamAScore+">"+" vs " + teamB.getName()+"<"+teamBScore +">"+"   "+date;
+-	}
+-}
+\ No newline at end of file
+Index: src/LeagueManager.java
+===================================================================
+--- src/LeagueManager.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ src/LeagueManager.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
+@@ -1,11 +0,0 @@
+-import java.time.LocalDate;
+-
+-public  interface LeagueManager{
+-	void createClub(String name, String location);
+-	void deleteClub(int index);
+-	void viewClub(int index);
+-	void displayTable();
+-	Match addMatch(LocalDate dateL, SportsClub oneClub, int oneClubScore, SportsClub twoClub, int twoClubScore);
+-	void save();
+-	void load();
+-}
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Checkout_at_1_3_2021_12_04_AM__Default_Changelist_.xml
+===================================================================
+--- .idea/shelf/Uncommitted_changes_before_Checkout_at_1_3_2021_12_04_AM__Default_Changelist_.xml	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ .idea/shelf/Uncommitted_changes_before_Checkout_at_1_3_2021_12_04_AM__Default_Changelist_.xml	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Checkout_at_1_3_2021_12_04_AM_[Default_Changelist]" date="1609612540325" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_1_3_2021_12_04_AM_[Default_Changelist]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 1/3/2021 12:04 AM [Default Changelist]" />
+-</changelist>
+\ No newline at end of file
+Index: src/SchoolFootballClubs.java
+===================================================================
+--- src/SchoolFootballClubs.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ src/SchoolFootballClubs.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
+@@ -1,9 +0,0 @@
+-public class SchoolFootballClubs extends FootballClub {
+-
+-	public SchoolFootballClubs() {
+-	}
+-
+-	public SchoolFootballClubs(String name, String location) {
+-		super(name, location);
+-	}
+-}
+\ No newline at end of file
+Index: src/SportsClub.java
+===================================================================
+--- src/SportsClub.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ src/SportsClub.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
+@@ -1,67 +0,0 @@
+-import java.io.Serializable;
+-
+-public abstract class  SportsClub implements Serializable{
+-	String name;
+-	String location;
+-	int wins;
+-	int draws;
+-	int defeat;
+-	int score;
+-	int pointCount;
+-	int matchCount;
+-
+-	public SportsClub(){}
+-	
+-
+-
+-	public String getName() { return name; }
+-	public void setName(String name) { this.name=name;	}
+-
+-	public String getLocation() { return location; }
+-	public void setLocation(String location) { this.location=location;	}
+-
+-	public int getWins() { return wins; }
+-	public void setWins(int wins) { this.wins = wins; }
+-
+-	public int getDraws() {return draws;}
+-	public void setDraws(int draws) { this.draws = draws; }
+-
+-	public int getDefeat() {return defeat;}
+-	public void setDefeat(int defeat) {	 this.defeat = defeat; }
+-
+-	public int getScore() {return score;}
+-	public void setScore(int score) {this.score = score;}
+-
+-	public int getPointCount() {return pointCount;}
+-	public void setPointCount(int pointCount) {		this.pointCount = pointCount; }
+-
+-	public int getMatchCount() {return matchCount;}
+-	public void setMatchCount(int matchCount) {this.matchCount = matchCount;}
+-
+-	@Override
+-    public String toString() {
+-       	return "  \nname          : " + name +
+-				" \nlocation      : " + location+
+-				" \nwins          : " + wins +
+-				" \ndraws         : " + draws +
+-				" \ndefeat        : " + defeat+
+-				" \nscore         : " + score +
+-				" \npointCount    : " + pointCount +
+-				" \nmatchCount    : " + matchCount;
+-			}
+-
+-	public static <T> int sortPointsGoal(SportsClub t, SportsClub t1) {
+-		if (t.getPointCount()==t1.getPointCount()){
+-			return ((FootballClub)(t)).getGoalsScored()-((FootballClub)(t1)).getGoalsScored();
+-		}else return t.getPointCount()-t1.getPointCount();
+-	}
+-	public static <T> int sortGoal(SportsClub t, SportsClub t1) {
+-		return ((FootballClub)(t)).getGoalsScored()-((FootballClub)(t1)).getGoalsScored();
+-	}
+-	public static <T> int sortWins(SportsClub t, SportsClub t1) {
+-		return t.getWins()-t1.getWins();
+-	}
+-	public static <T> int sortPoints(SportsClub t, SportsClub t1) {
+-		return t.getPointCount()-t1.getPointCount();
+-	}
+-}
+\ No newline at end of file
+Index: .idea/workspace.xml
+===================================================================
+--- .idea/workspace.xml	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ .idea/workspace.xml	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
+@@ -1,461 +0,0 @@
+-<?xml version="1.0" encoding="UTF-8"?>
+-<project version="4">
+-  <component name="BranchesTreeState">
+-    <expand>
+-      <path>
+-        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+-        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+-      </path>
+-      <path>
+-        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+-        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+-      </path>
+-      <path>
+-        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+-        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+-        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+-      </path>
+-    </expand>
+-    <select />
+-  </component>
+-  <component name="ChangeListManager">
+-    <list default="true" id="6eca2592-e2f1-479e-916b-4f21b20a62f0" name="Default Changelist" comment="test format">
+-      <change afterPath="$PROJECT_DIR$/.idea/Premier League.iml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Model/FootballClub.java" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Model/LeagueManager.java" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Model/Match.java" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Model/Menu.java" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Model/PremierLeagueManager.java" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Model/SchoolFootballClubs.java" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Model/Serialize.java" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Model/SportsClub.java" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/Model/UniversityFootballClub.java" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/View/GuiJavaFx.java" beforeDir="false" />
+-    </list>
+-    <option name="SHOW_DIALOG" value="false" />
+-    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+-    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+-    <option name="LAST_RESOLUTION" value="IGNORE" />
+-  </component>
+-  <component name="CodeStyleSettingsInfer">
+-    <option name="done" value="true" />
+-  </component>
+-  <component name="ComposerSettings">
+-    <execution />
+-  </component>
+-  <component name="FileTemplateManagerImpl">
+-    <option name="RECENT_TEMPLATES">
+-      <list>
+-        <option value="Class" />
+-      </list>
+-    </option>
+-  </component>
+-  <component name="Git.Settings">
+-    <option name="RECENT_BRANCH_BY_REPOSITORY">
+-      <map>
+-        <entry key="$PROJECT_DIR$" value="main" />
+-        <entry key="$PROJECT_DIR$/src" value="combine_playframework" />
+-      </map>
+-    </option>
+-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+-  </component>
+-  <component name="JupyterTrust" id="2ac186fb-b96e-43b5-a62b-4df7ea5f03ec" />
+-  <component name="ProjectCodeStyleSettingsMigration">
+-    <option name="version" value="1" />
+-  </component>
+-  <component name="ProjectId" id="1k2HhVgWQVcY6M9SXY1MKCiMuDX" />
+-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+-  <component name="ProjectViewState">
+-    <option name="hideEmptyMiddlePackages" value="true" />
+-    <option name="showLibraryContents" value="true" />
+-  </component>
+-  <component name="PropertiesComponent">
+-    <property name="ChangesTree.GroupingKeys" value="directory" />
+-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+-    <property name="ToolWindowRun.ShowToolbar" value="false" />
+-    <property name="WebServerToolWindowFactoryState" value="false" />
+-    <property name="aspect.path.notification.shown" value="true" />
+-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+-    <property name="nodejs_package_manager_path" value="npm" />
+-    <property name="project.structure.last.edited" value="Modules" />
+-    <property name="project.structure.proportion" value="0.15" />
+-    <property name="project.structure.side.proportion" value="0.17931035" />
+-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+-  </component>
+-  <component name="RecentsManager">
+-    <key name="ExtractSuperBase.RECENT_KEYS">
+-      <recent name="iit.oop.cw" />
+-    </key>
+-    <key name="CopyFile.RECENT_KEYS">
+-      <recent name="G:\My Drive\iit\lvl05\SEM 1\OOP\CW\code\src\View" />
+-    </key>
+-    <key name="MoveFile.RECENT_KEYS">
+-      <recent name="G:\My Drive\iit\lvl05\SEM 1\OOP\CW\code\src" />
+-      <recent name="G:\My Drive\iit\lvl05\SEM 1\OOP\CW\code\src\Model" />
+-    </key>
+-  </component>
+-  <component name="RunAnythingCache">
+-    <option name="myCommands">
+-      <command value="Menu" />
+-    </option>
+-  </component>
+-  <component name="RunManager" selected="Application.GuiJavaFx">
+-    <configuration name="GuiJavaFx" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+-      <option name="MAIN_CLASS_NAME" value="View.GuiJavaFx" />
+-      <module name="PremierLeagueManager" />
+-      <extension name="coverage">
+-        <pattern>
+-          <option name="PATTERN" value="View.*" />
+-          <option name="ENABLED" value="true" />
+-        </pattern>
+-      </extension>
+-      <method v="2">
+-        <option name="Make" enabled="true" />
+-      </method>
+-    </configuration>
+-    <configuration name="Menu" type="Application" factoryName="Application" nameIsGenerated="true">
+-      <option name="MAIN_CLASS_NAME" value="Menu" />
+-      <module name="Premier League" />
+-      <extension name="coverage">
+-        <pattern>
+-          <option name="PATTERN" value="View.*" />
+-          <option name="ENABLED" value="true" />
+-        </pattern>
+-      </extension>
+-      <method v="2">
+-        <option name="Make" enabled="true" />
+-      </method>
+-    </configuration>
+-    <configuration name="Menu" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+-      <option name="MAIN_CLASS_NAME" value="Model.Menu" />
+-      <module name="PremierLeagueManager" />
+-      <method v="2">
+-        <option name="Make" enabled="true" />
+-      </method>
+-    </configuration>
+-    <recent_temporary>
+-      <list>
+-        <item itemvalue="Application.GuiJavaFx" />
+-        <item itemvalue="Application.GuiJavaFx" />
+-        <item itemvalue="Application.GuiJavaFx" />
+-        <item itemvalue="Application.GuiJavaFx" />
+-        <item itemvalue="Application.GuiJavaFx" />
+-      </list>
+-    </recent_temporary>
+-  </component>
+-  <component name="SvnConfiguration">
+-    <configuration />
+-  </component>
+-  <component name="TaskManager">
+-    <task active="true" id="Default" summary="Default task">
+-      <changelist id="6eca2592-e2f1-479e-916b-4f21b20a62f0" name="Default Changelist" comment="" />
+-      <created>1604891885641</created>
+-      <option name="number" value="Default" />
+-      <option name="presentableId" value="Default" />
+-      <updated>1604891885641</updated>
+-      <workItem from="1604891892404" duration="2868000" />
+-      <workItem from="1604903648798" duration="4225000" />
+-      <workItem from="1605087166088" duration="3192000" />
+-      <workItem from="1605328570717" duration="60950000" />
+-      <workItem from="1605448964516" duration="280000" />
+-      <workItem from="1605449429828" duration="12000" />
+-      <workItem from="1605449508849" duration="23000" />
+-      <workItem from="1605451218680" duration="985000" />
+-      <workItem from="1605452328834" duration="37000" />
+-      <workItem from="1605492139678" duration="487000" />
+-      <workItem from="1605493178445" duration="3152000" />
+-      <workItem from="1605496429900" duration="3456000" />
+-      <workItem from="1605869629585" duration="19580000" />
+-      <workItem from="1606049305923" duration="26302000" />
+-      <workItem from="1606541578769" duration="14444000" />
+-      <workItem from="1606570148247" duration="1862000" />
+-      <workItem from="1606837438783" duration="2743000" />
+-      <workItem from="1606892341243" duration="6462000" />
+-      <workItem from="1606997275605" duration="54547000" />
+-      <workItem from="1607233880214" duration="3714000" />
+-      <workItem from="1607313938330" duration="22431000" />
+-      <workItem from="1607471809174" duration="595000" />
+-      <workItem from="1607476161130" duration="23538000" />
+-      <workItem from="1607664907363" duration="10851000" />
+-      <workItem from="1607750996613" duration="7911000" />
+-      <workItem from="1607967750686" duration="340000" />
+-      <workItem from="1608039701677" duration="1993000" />
+-      <workItem from="1608182123300" duration="19000" />
+-      <workItem from="1608649955815" duration="728000" />
+-      <workItem from="1608711810943" duration="4199000" />
+-      <workItem from="1608838221584" duration="56000" />
+-      <workItem from="1609151056052" duration="14041000" />
+-      <workItem from="1609434728278" duration="9316000" />
+-      <workItem from="1609472232894" duration="5361000" />
+-      <workItem from="1609488904883" duration="1254000" />
+-      <workItem from="1609492419308" duration="1259000" />
+-      <workItem from="1609530277387" duration="613000" />
+-      <workItem from="1609574789256" duration="3313000" />
+-      <workItem from="1609611584346" duration="915000" />
+-      <workItem from="1609718094980" duration="4218000" />
+-    </task>
+-    <task id="LOCAL-00001" summary="table switch working">
+-      <created>1607235365920</created>
+-      <option name="number" value="00001" />
+-      <option name="presentableId" value="LOCAL-00001" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1607235365920</updated>
+-    </task>
+-    <task id="LOCAL-00002" summary="fix sort">
+-      <created>1607314195493</created>
+-      <option name="number" value="00002" />
+-      <option name="presentableId" value="LOCAL-00002" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1607314195493</updated>
+-    </task>
+-    <task id="LOCAL-00003" summary="save 2 files">
+-      <created>1609178671139</created>
+-      <option name="number" value="00003" />
+-      <option name="presentableId" value="LOCAL-00003" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1609178671139</updated>
+-    </task>
+-    <task id="LOCAL-00004" summary="match shows the team names">
+-      <created>1609437123813</created>
+-      <option name="number" value="00004" />
+-      <option name="presentableId" value="LOCAL-00004" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1609437123813</updated>
+-    </task>
+-    <task id="LOCAL-00005" summary="search and reset date added">
+-      <created>1609443090356</created>
+-      <option name="number" value="00005" />
+-      <option name="presentableId" value="LOCAL-00005" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1609443090357</updated>
+-    </task>
+-    <task id="LOCAL-00006" summary="added program selection menu">
+-      <created>1609473083689</created>
+-      <option name="number" value="00006" />
+-      <option name="presentableId" value="LOCAL-00006" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1609473083689</updated>
+-    </task>
+-    <task id="LOCAL-00007" summary="added program selection menu">
+-      <created>1609487008887</created>
+-      <option name="number" value="00007" />
+-      <option name="presentableId" value="LOCAL-00007" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1609487008887</updated>
+-    </task>
+-    <task id="LOCAL-00008" summary="added program selection menu">
+-      <created>1609487292584</created>
+-      <option name="number" value="00008" />
+-      <option name="presentableId" value="LOCAL-00008" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1609487292584</updated>
+-    </task>
+-    <task id="LOCAL-00009" summary="test format">
+-      <created>1609489018874</created>
+-      <option name="number" value="00009" />
+-      <option name="presentableId" value="LOCAL-00009" />
+-      <option name="project" value="LOCAL" />
+-      <updated>1609489018874</updated>
+-    </task>
+-    <option name="localTasksCounter" value="10" />
+-    <servers />
+-  </component>
+-  <component name="TypeScriptGeneratedFilesManager">
+-    <option name="version" value="2" />
+-  </component>
+-  <component name="Vcs.Log.Tabs.Properties">
+-    <option name="TAB_STATES">
+-      <map>
+-        <entry key="MAIN">
+-          <value>
+-            <State />
+-          </value>
+-        </entry>
+-      </map>
+-    </option>
+-    <option name="oldMeFiltersMigrated" value="true" />
+-  </component>
+-  <component name="VcsManagerConfiguration">
+-    <ignored-roots>
+-      <path value="$PROJECT_DIR$/.." />
+-      <path value="$PROJECT_DIR$/src" />
+-    </ignored-roots>
+-    <MESSAGE value="table switch working" />
+-    <MESSAGE value="fix sort" />
+-    <MESSAGE value="save 2 files" />
+-    <MESSAGE value="match shows the team names" />
+-    <MESSAGE value="search and reset date added" />
+-    <MESSAGE value="added program selection menu" />
+-    <MESSAGE value="test format" />
+-    <option name="LAST_COMMIT_MESSAGE" value="test format" />
+-  </component>
+-  <component name="WindowStateProjectService">
+-    <state x="657" y="158" key="#GuiJavaFx" timestamp="1609612556821">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="657" y="158" key="#GuiJavaFx/1920.24.1536.840/0.30.1920.1050@0.30.1920.1050" timestamp="1609612556821" />
+-    <state x="414" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1607524412293">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="414" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog/-1920.288.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607242618950" />
+-    <state x="414" y="210" key="#com.intellij.execution.impl.EditConfigurationsDialog/-1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607524412293" />
+-    <state x="518" y="351" width="829" height="568" key="#com.intellij.ide.util.MemberChooser" timestamp="1607318655260">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="518" y="351" key="#com.intellij.ide.util.MemberChooser/-1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607318655260" />
+-    <state x="518" y="351" key="#com.intellij.ide.util.MemberChooser/-1920.310.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607107896791" />
+-    <state x="518" y="351" width="829" height="568" key="#com.intellij.ide.util.MemberChooser/0.30.1920.1050@0.30.1920.1050" timestamp="1606894078660" />
+-    <state x="743" y="449" width="433" height="218" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1609718347172">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="743" y="449" width="433" height="218" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/1920.24.1536.840/0.30.1920.1050@0.30.1920.1050" timestamp="1609718347172" />
+-    <state x="2610" y="272" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1607002069680">
+-      <screen x="1920" y="0" width="1920" height="1050" />
+-    </state>
+-    <state x="2610" y="272" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.30.1920.1050/1920.0.1920.1050@1920.0.1920.1050" timestamp="1607002069680" />
+-    <state x="690" y="302" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.30.1920.1050@0.30.1920.1050" timestamp="1606080816988" />
+-    <state x="690" y="301" key="#com.intellij.refactoring.typeMigration.ui.FailedConversionsDialog" timestamp="1607522275395">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="690" y="301" key="#com.intellij.refactoring.typeMigration.ui.FailedConversionsDialog/-1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607522275395" />
+-    <state x="780" y="350" key="FileChooserDialogImpl" timestamp="1609718779496">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="755" y="329" key="FileChooserDialogImpl/0.0.1858.1080@0.0.1858.1080" timestamp="1608182140539" />
+-    <state x="780" y="350" key="FileChooserDialogImpl/0.30.1920.1050@0.30.1920.1050" timestamp="1606071112355" />
+-    <state x="780" y="350" key="FileChooserDialogImpl/1920.24.1536.840/0.30.1920.1050@0.30.1920.1050" timestamp="1609718779496" />
+-    <state x="780" y="350" key="FileChooserDialogImpl/1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1609439161347" />
+-    <state x="0" y="30" key="FileDocumentManager.FileCacheConflict" timestamp="1607115121583">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="0" y="30" key="FileDocumentManager.FileCacheConflict/0.30.1920.1050@0.30.1920.1050" timestamp="1607115121583" />
+-    <state width="573" height="922" key="GridCell.Tab.0.bottom" timestamp="1609581921293">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state width="323" height="747" key="GridCell.Tab.0.bottom/-1920.288.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607242999553" />
+-    <state width="552" height="1762" key="GridCell.Tab.0.bottom/-1920.30.1920.1050/0.30.1080.1890@0.30.1080.1890" timestamp="1607532525423" />
+-    <state width="553" height="922" key="GridCell.Tab.0.bottom/-1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607764489865" />
+-    <state width="1877" height="247" key="GridCell.Tab.0.bottom/-1920.310.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607111541941" />
+-    <state width="356" height="950" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1607710087246" />
+-    <state width="607" height="922" key="GridCell.Tab.0.bottom/0.30.1920.1050/-1920.0.1920.1050@-1920.0.1920.1050" timestamp="1607441409908" />
+-    <state width="1877" height="167" key="GridCell.Tab.0.bottom/0.30.1920.1050/1920.0.1920.1050@1920.0.1920.1050" timestamp="1607014941331" />
+-    <state width="998" height="609" key="GridCell.Tab.0.bottom/0.30.1920.1050@0.30.1920.1050" timestamp="1607678357901" />
+-    <state width="573" height="922" key="GridCell.Tab.0.bottom/1920.24.1536.840/0.30.1920.1050@0.30.1920.1050" timestamp="1609581921293" />
+-    <state width="573" height="922" key="GridCell.Tab.0.bottom/1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1609488961213" />
+-    <state width="573" height="922" key="GridCell.Tab.0.center" timestamp="1609581921292">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state width="323" height="747" key="GridCell.Tab.0.center/-1920.288.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607242999553" />
+-    <state width="552" height="1762" key="GridCell.Tab.0.center/-1920.30.1920.1050/0.30.1080.1890@0.30.1080.1890" timestamp="1607532525423" />
+-    <state width="553" height="922" key="GridCell.Tab.0.center/-1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607764489864" />
+-    <state width="1877" height="247" key="GridCell.Tab.0.center/-1920.310.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607111541941" />
+-    <state width="356" height="950" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1607710087246" />
+-    <state width="607" height="922" key="GridCell.Tab.0.center/0.30.1920.1050/-1920.0.1920.1050@-1920.0.1920.1050" timestamp="1607441409908" />
+-    <state width="1877" height="167" key="GridCell.Tab.0.center/0.30.1920.1050/1920.0.1920.1050@1920.0.1920.1050" timestamp="1607014941331" />
+-    <state width="998" height="609" key="GridCell.Tab.0.center/0.30.1920.1050@0.30.1920.1050" timestamp="1607678357901" />
+-    <state width="573" height="922" key="GridCell.Tab.0.center/1920.24.1536.840/0.30.1920.1050@0.30.1920.1050" timestamp="1609581921292" />
+-    <state width="573" height="922" key="GridCell.Tab.0.center/1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1609488961212" />
+-    <state width="573" height="922" key="GridCell.Tab.0.left" timestamp="1609581921292">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state width="323" height="747" key="GridCell.Tab.0.left/-1920.288.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607242999553" />
+-    <state width="552" height="1762" key="GridCell.Tab.0.left/-1920.30.1920.1050/0.30.1080.1890@0.30.1080.1890" timestamp="1607532525423" />
+-    <state width="553" height="922" key="GridCell.Tab.0.left/-1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607764489863" />
+-    <state width="1877" height="247" key="GridCell.Tab.0.left/-1920.310.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607111541941" />
+-    <state width="356" height="950" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1607710087246" />
+-    <state width="607" height="922" key="GridCell.Tab.0.left/0.30.1920.1050/-1920.0.1920.1050@-1920.0.1920.1050" timestamp="1607441409906" />
+-    <state width="1877" height="167" key="GridCell.Tab.0.left/0.30.1920.1050/1920.0.1920.1050@1920.0.1920.1050" timestamp="1607014941330" />
+-    <state width="998" height="609" key="GridCell.Tab.0.left/0.30.1920.1050@0.30.1920.1050" timestamp="1607678357900" />
+-    <state width="573" height="922" key="GridCell.Tab.0.left/1920.24.1536.840/0.30.1920.1050@0.30.1920.1050" timestamp="1609581921292" />
+-    <state width="573" height="922" key="GridCell.Tab.0.left/1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1609488961212" />
+-    <state width="573" height="922" key="GridCell.Tab.0.right" timestamp="1609581921293">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state width="323" height="747" key="GridCell.Tab.0.right/-1920.288.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607242999553" />
+-    <state width="552" height="1762" key="GridCell.Tab.0.right/-1920.30.1920.1050/0.30.1080.1890@0.30.1080.1890" timestamp="1607532525423" />
+-    <state width="553" height="922" key="GridCell.Tab.0.right/-1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607764489864" />
+-    <state width="1877" height="247" key="GridCell.Tab.0.right/-1920.310.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607111541941" />
+-    <state width="356" height="950" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1607710087246" />
+-    <state width="607" height="922" key="GridCell.Tab.0.right/0.30.1920.1050/-1920.0.1920.1050@-1920.0.1920.1050" timestamp="1607441409908" />
+-    <state width="1877" height="167" key="GridCell.Tab.0.right/0.30.1920.1050/1920.0.1920.1050@1920.0.1920.1050" timestamp="1607014941331" />
+-    <state width="998" height="609" key="GridCell.Tab.0.right/0.30.1920.1050@0.30.1920.1050" timestamp="1607678357901" />
+-    <state width="573" height="922" key="GridCell.Tab.0.right/1920.24.1536.840/0.30.1920.1050@0.30.1920.1050" timestamp="1609581921293" />
+-    <state width="573" height="922" key="GridCell.Tab.0.right/1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1609488961213" />
+-    <state width="1877" height="352" key="GridCell.Tab.1.bottom" timestamp="1609472933109">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state width="1877" height="352" key="GridCell.Tab.1.bottom/0.30.1920.1050@0.30.1920.1050" timestamp="1606111064305" />
+-    <state width="1877" height="352" key="GridCell.Tab.1.bottom/1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1609472933109" />
+-    <state width="1877" height="352" key="GridCell.Tab.1.center" timestamp="1609472933108">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state width="1877" height="352" key="GridCell.Tab.1.center/0.30.1920.1050@0.30.1920.1050" timestamp="1606111064304" />
+-    <state width="1877" height="352" key="GridCell.Tab.1.center/1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1609472933108" />
+-    <state width="1877" height="352" key="GridCell.Tab.1.left" timestamp="1609472933108">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state width="1877" height="352" key="GridCell.Tab.1.left/0.30.1920.1050@0.30.1920.1050" timestamp="1606111064304" />
+-    <state width="1877" height="352" key="GridCell.Tab.1.left/1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1609472933108" />
+-    <state width="1877" height="352" key="GridCell.Tab.1.right" timestamp="1609472933108">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state width="1877" height="352" key="GridCell.Tab.1.right/0.30.1920.1050@0.30.1920.1050" timestamp="1606111064304" />
+-    <state width="1877" height="352" key="GridCell.Tab.1.right/1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1609472933108" />
+-    <state x="74" y="293" key="IDE.errors.dialog" timestamp="1606552932657">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="74" y="293" key="IDE.errors.dialog/0.30.1920.1050@0.30.1920.1050" timestamp="1606552932657" />
+-    <state x="677" y="153" key="SettingsEditor" timestamp="1609718472712">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="657" y="148" key="SettingsEditor/0.30.1920.1050@0.30.1920.1050" timestamp="1604917976666" />
+-    <state x="677" y="153" key="SettingsEditor/1920.24.1536.840/0.30.1920.1050@0.30.1920.1050" timestamp="1609718472712" />
+-    <state x="677" y="153" key="SettingsEditor/1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1609488982000" />
+-    <state width="498" height="446" key="SwitcherDM" timestamp="1607504116903">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state width="498" height="446" key="SwitcherDM/0.30.1920.1050@0.30.1920.1050" timestamp="1607504116903" />
+-    <state x="552" y="287" key="Vcs.Push.Dialog.v2" timestamp="1609487300140">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="552" y="287" key="Vcs.Push.Dialog.v2/1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1609487300140" />
+-    <state x="459" y="143" width="1413" height="866" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1605892255050">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="459" y="143" width="1413" height="866" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.30.1920.1050@0.30.1920.1050" timestamp="1605892255050" />
+-    <state x="769" y="469" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1607150642478">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="769" y="469" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/-1920.288.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607150642478" />
+-    <state x="748" y="318" key="extract.method.dialog" timestamp="1609438289297">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="748" y="318" key="extract.method.dialog/-1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1607758883206" />
+-    <state x="748" y="318" key="extract.method.dialog/0.30.1920.1050@0.30.1920.1050" timestamp="1605361818576" />
+-    <state x="748" y="318" key="extract.method.dialog/1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1609438289297" />
+-    <state x="739" y="226" key="git4idea.branch.GitSmartOperationDialog" timestamp="1609612445301">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="739" y="226" key="git4idea.branch.GitSmartOperationDialog/1920.24.1536.840/0.30.1920.1050@0.30.1920.1050" timestamp="1609612445301" />
+-    <state x="342" y="175" key="new project wizard" timestamp="1606566738481">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="342" y="175" key="new project wizard/0.30.1920.1050@0.30.1920.1050" timestamp="1606566738481" />
+-    <state x="2063" y="230" width="672" height="677" key="run.anything.popup" timestamp="1607001683589">
+-      <screen x="1920" y="0" width="1920" height="1050" />
+-    </state>
+-    <state x="2063" y="230" width="672" height="677" key="run.anything.popup/0.30.1920.1050/1920.0.1920.1050@1920.0.1920.1050" timestamp="1607001683589" />
+-    <state x="143" y="260" key="run.anything.popup/0.30.1920.1050@0.30.1920.1050" timestamp="1606067846080" />
+-    <state x="623" y="269" width="672" height="678" key="search.everywhere.popup" timestamp="1609436310050">
+-      <screen x="0" y="30" width="1920" height="1050" />
+-    </state>
+-    <state x="2543" y="239" width="672" height="678" key="search.everywhere.popup/0.30.1920.1050/1920.0.1920.1050@1920.0.1920.1050" timestamp="1607001675349" />
+-    <state x="623" y="269" width="672" height="678" key="search.everywhere.popup/1920.30.1920.1050/0.30.1920.1050@0.30.1920.1050" timestamp="1609436310050" />
+-  </component>
+-</project>
+\ No newline at end of file
+Index: src/PremierLeagueManager.java
+===================================================================
+--- src/PremierLeagueManager.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ src/PremierLeagueManager.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
+@@ -1,105 +0,0 @@
+-import java.time.LocalDate;
+-import java.util.ArrayList;
+-import java.util.List;
+-public class PremierLeagueManager implements LeagueManager{
+-
+-	static List <SportsClub> clubList= new ArrayList<>();
+-	static List <Match> matchList = new ArrayList<>();
+-
+-	private static PremierLeagueManager instance= null;
+-
+-	private PremierLeagueManager(){}
+-	public static PremierLeagueManager getInstance(){
+-		if (instance== null){
+-			synchronized (PremierLeagueManager.class){
+-				if(instance==null)instance = new PremierLeagueManager();
+-			}
+-		}return instance;
+-	}
+-
+-	@Override
+-	public void createClub(String name, String location) {
+-		SportsClub newClub = new FootballClub(name,location);
+-		clubList.add(newClub);
+-	}
+-
+-	@Override
+-	public void deleteClub(int index) {
+-		clubList.remove(index);
+-	}
+-	@Override
+-	public void viewClub(int index) {
+-		SportsClub clubP = clubList.get(index);
+-        System.out.println(clubP);
+-	}
+-	@Override
+-	public void displayTable() { }
+-	@Override
+-	public Match addMatch(LocalDate dateL, SportsClub oneClub, int oneClubScore, SportsClub twoClub, int twoClubScore) {
+-
+-		oneClub.setMatchCount(oneClub.getMatchCount()+1);
+-		twoClub.setMatchCount(twoClub.getMatchCount()+1);
+-
+-		oneClub.setScore(oneClub.getScore()+oneClubScore);
+-		twoClub.setScore(twoClub.getScore()+twoClubScore);
+-
+-		if (oneClubScore >twoClubScore) {
+-			oneClub.setWins(oneClub.getWins()+1);
+-			oneClub.setPointCount(oneClub.getPointCount()+3);
+-			twoClub.setDefeat(twoClub.getDefeat()+1);
+-		}else if (twoClubScore > oneClubScore){
+-			twoClub.setWins(twoClub.getWins()+1);
+-			twoClub.setPointCount(twoClub.getPointCount()+3);
+-			oneClub.setDefeat(oneClub.getDefeat()+1);
+-		}else {
+-			oneClub.setDraws(oneClub.getDraws()+1);
+-			twoClub.setDraws(twoClub.getDraws()+1);
+-			oneClub.setPointCount(oneClub.getPointCount()+1);
+-			twoClub.setPointCount(twoClub.getPointCount()+1);
+-		}
+-
+-		((FootballClub) oneClub).setGoalsScored(((FootballClub) oneClub).getGoalsScored()+oneClubScore);
+-		((FootballClub) twoClub).setGoalsReceived(((FootballClub) twoClub).getGoalsReceived()+oneClubScore);
+-
+-		((FootballClub) twoClub).setGoalsScored(((FootballClub) twoClub).getGoalsScored()+twoClubScore);
+-		((FootballClub) oneClub).setGoalsReceived(((FootballClub) oneClub).getGoalsReceived()+twoClubScore);
+-
+-		Match match = new Match();
+-		match.setDate(dateL);
+-		match.setTeamA((FootballClub) oneClub);
+-		match.setTeamB((FootballClub) twoClub);
+-		match.setTeamAScore(oneClubScore);
+-		match.setTeamBScore(twoClubScore);
+-		matchList.add(match);
+-		System.out.println("match = " + match);
+-		return match ;
+-	}
+-	@Override
+-	public void save() {
+-		Serialize save = new Serialize();
+-		save.serialize(clubList,matchList);
+-	}
+-	@Override
+-	public void load() {
+-		Serialize load = new Serialize();
+-		ArrayList <ArrayList> deserialized = load.deserialize();
+-
+-		if (deserialized!=null) {
+-			setClubList(deserialized.get(0));
+-			setMatchList(deserialized.get(1));
+-		}
+-	}
+-
+-	public List<SportsClub> getClubList() {
+-		return clubList;
+-	}
+-	public List<Match> getMatchList() { return matchList; }
+-
+-	public static void setClubList(ArrayList<SportsClub> clubList) {
+-		PremierLeagueManager.clubList = clubList;
+-	}
+-
+-	public static void setMatchList(ArrayList<Match> matchList) {
+-		PremierLeagueManager.matchList = matchList;
+-	}
+-}
+\ No newline at end of file
+Index: src/UniversityFootballClub.java
+===================================================================
+--- src/UniversityFootballClub.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ src/UniversityFootballClub.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
+@@ -1,302 +0,0 @@
+-import javafx.application.Application;
+-import javafx.collections.FXCollections;
+-import javafx.collections.ObservableList;
+-import javafx.scene.Scene;
+-import javafx.scene.control.*;
+-import javafx.scene.control.cell.PropertyValueFactory;
+-import javafx.scene.layout.AnchorPane;
+-import javafx.stage.Stage;
+-
+-import java.time.LocalDate;
+-import java.time.Month;
+-import java.time.temporal.ChronoUnit;
+-import java.util.ArrayList;
+-import java.util.Collections;
+-import java.util.List;
+-import java.util.Random;
+-
+-public class UniversityFootballClub extends FootballClub{
+-
+-	public UniversityFootballClub() {
+-	}
+-
+-	public UniversityFootballClub(String name, String location) {
+-		super(name, location);
+-	}
+-
+-    public static class GuiJavaFx extends Application {
+-        List<SportsClub> clublistData;
+-        List<Match> matchlistData;
+-        private boolean state=true;
+-
+-
+-        public void update(){
+-            Serialize load = new Serialize();
+-            ArrayList<ArrayList> deserialized = load.deserialize();
+-
+-            clublistData = (List<SportsClub>) deserialized.get(0);
+-            matchlistData= (List<Match>) deserialized.get(1);
+-        }
+-
+-        @Override
+-        public void start(Stage primaryStage) {
+-            Stage window = new Stage();
+-            window.setTitle("Premier League");
+-            clubTableScreen(window);
+-        }
+-
+-        public ObservableList dataToTable(List listIn){
+-            ObservableList table = FXCollections.observableArrayList();
+-            table.addAll(listIn);
+-            return table;
+-        }
+-        public TableView<SportsClub> clubstable(){
+-
+-            TableView<SportsClub> clubTable = new TableView<>();
+-            TableColumn<SportsClub,String> clubName = new TableColumn<>("Club");
+-            clubName.setMinWidth(80);
+-            clubName.setCellValueFactory(new PropertyValueFactory<>("name"));
+-
+-            TableColumn<SportsClub,String> clubLoc = new TableColumn<>("Location");
+-            clubLoc.setMinWidth(80);
+-            clubLoc.setCellValueFactory(new PropertyValueFactory<>("location"));
+-
+-            TableColumn<SportsClub,String> clubPoints = new TableColumn<>("Points");
+-            clubPoints.setMinWidth(80);
+-            clubPoints.setCellValueFactory(new PropertyValueFactory<>("pointCount"));
+-
+-            TableColumn<SportsClub,String> clubGoals = new TableColumn<>("Goals");
+-            clubGoals.setMinWidth(80);
+-            clubGoals.setCellValueFactory(new PropertyValueFactory<>("goalsScored"));
+-
+-            TableColumn<SportsClub,String> clubWins = new TableColumn<>("Wins");
+-            clubWins.setMinWidth(80);
+-            clubWins.setCellValueFactory(new PropertyValueFactory<>("wins"));
+-
+-            TableColumn<SportsClub,String> clubLoss = new TableColumn<>("Loss");
+-            clubLoss.setMinWidth(80);
+-            clubLoss.setCellValueFactory(new PropertyValueFactory<>("defeat"));
+-
+-            TableColumn<SportsClub,String> clubDraw = new TableColumn<>("Draw");
+-            clubDraw.setMinWidth(80);
+-            clubDraw.setCellValueFactory(new PropertyValueFactory<>("draws"));
+-
+-            TableColumn<SportsClub,String> clubMatch = new TableColumn<>("Matches");
+-            clubMatch.setMinWidth(80);
+-            clubMatch.setCellValueFactory(new PropertyValueFactory<>("matchCount"));
+-
+-            clubTable.setItems(dataToTable(clublistData));
+-            clubTable.getColumns().add(clubName);
+-            clubTable.getColumns().add(clubLoc);
+-            clubTable.getColumns().add(clubPoints);
+-            clubTable.getColumns().add(clubGoals);
+-            clubTable.getColumns().add(clubWins);
+-            clubTable.getColumns().add(clubLoss);
+-            clubTable.getColumns().add(clubDraw);
+-            clubTable.getColumns().add(clubMatch);
+-
+-            return clubTable;
+-        }
+-        public TableView<SportsClub> matchtable(){
+-
+-            TableView<SportsClub> matchTable = new TableView<>();
+-            TableColumn<SportsClub,String> matchDate = new TableColumn<>("Date");
+-            matchDate.setMinWidth(80);
+-            matchDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+-
+-            TableColumn<SportsClub,String> teamA = new TableColumn<>("Team A");
+-            teamA.setMinWidth(80);
+-            teamA.setCellValueFactory(new PropertyValueFactory<>("teamA.name"));
+-
+-            TableColumn<SportsClub,String> teamAScore = new TableColumn<>("Score");
+-            teamAScore.setMinWidth(80);
+-            teamAScore.setCellValueFactory(new PropertyValueFactory<>("teamAScore"));
+-
+-            TableColumn<SportsClub,String> teamB = new TableColumn<>("Team B");
+-            teamB.setMinWidth(80);
+-            teamB.setCellValueFactory(new PropertyValueFactory<>("teamB.name"));
+-
+-            TableColumn<SportsClub,String> teamBScore = new TableColumn<>("Score");
+-            teamBScore.setMinWidth(80);
+-            teamBScore.setCellValueFactory(new PropertyValueFactory<>("teamBScore"));
+-
+-
+-            matchTable.setItems(dataToTable(matchlistData));
+-            matchTable.getColumns().add(matchDate);
+-            matchTable.getColumns().add(teamA);
+-            matchTable.getColumns().add(teamAScore);
+-            matchTable.getColumns().add(teamB);
+-            matchTable.getColumns().add(teamBScore);
+-            return matchTable;
+-        }
+-
+-        private void clubTableScreen(Stage window){
+-            AnchorPane first = new AnchorPane();
+-            Scene addViewFirst = new Scene(first, 680, 450);
+-            window.setScene(addViewFirst);
+-
+-            update();
+-            TableView<SportsClub> clubTable = clubstable();
+-            AnchorPane.setLeftAnchor(clubTable,20d);
+-            AnchorPane.setTopAnchor(clubTable,50d);
+-            AnchorPane.setBottomAnchor(clubTable,80d);
+-
+-            Button sortGoals = new Button("Goals");
+-            sortGoals.setOnAction(event -> {
+-                clublistData.sort((SportsClub::sortGoal));
+-                Collections.reverse(clublistData);
+-                clubTable.setItems(dataToTable(clublistData));
+-            });
+-            AnchorPane.setLeftAnchor(sortGoals,20d);
+-            AnchorPane.setBottomAnchor(sortGoals,20d);
+-
+-            Button sortWins = new Button("Wins");
+-            sortWins.setOnAction(event -> {
+-                clublistData.sort((SportsClub::sortWins));
+-                Collections.reverse(clublistData);
+-                clubTable.setItems(dataToTable(clublistData));
+-            });
+-            AnchorPane.setLeftAnchor(sortWins,90d);
+-            AnchorPane.setBottomAnchor(sortWins,20d);
+-
+-            Button sortPoints = new Button("Reset");
+-            sortPoints.setOnAction(event -> {
+-                clublistData.sort((SportsClub::sortPointsGoal));
+-                Collections.reverse(clublistData);
+-                clubTable.setItems(dataToTable(clublistData));
+-            });
+-            AnchorPane.setLeftAnchor(sortPoints,160d);
+-            AnchorPane.setBottomAnchor(sortPoints,20d);
+-
+-
+-            Button genMatch = new Button("Add Match");
+-            AnchorPane.setRightAnchor(genMatch,20d);
+-            AnchorPane.setBottomAnchor(genMatch,20d);
+-
+-            genMatch.setOnAction(event -> {
+-                genarateMatch();
+-                update();
+-                clublistData.sort((SportsClub::sortPointsGoal));
+-                Collections.reverse(clublistData);
+-                clubTable.setItems(dataToTable(clublistData));
+-            });
+-
+-            Label title = new Label("Club Details");
+-            title.setStyle("-fx-font: 20 arial;");
+-            AnchorPane.setTopAnchor(title,20d);
+-            AnchorPane.setLeftAnchor(title, 20d);
+-
+-
+-            Button switchtable = new Button("switch table");
+-            AnchorPane.setRightAnchor(switchtable,200d);
+-            AnchorPane.setBottomAnchor(switchtable,20d);
+-            switchtable.setOnAction(event -> {
+-                System.out.println("state = " + state);
+-                if (state){
+-                    matchTableScreen(window);
+-                    state=false;
+-                }else {
+-                    clubTableScreen(window);
+-                    state=true;
+-                }
+-                window.show();
+-            });
+-            first.getChildren().addAll(sortGoals,sortWins,sortPoints,clubTable,title,switchtable,genMatch);
+-            window.show();
+-        }
+-        private void matchTableScreen(Stage window){
+-            AnchorPane first = new AnchorPane();
+-            Scene addViewFirst = new Scene(first, 680, 450);
+-            window.setScene(addViewFirst);
+-
+-
+-            update();
+-            TableView<SportsClub> clubTable = matchtable();
+-
+-            AnchorPane.setLeftAnchor(clubTable,20d);
+-            AnchorPane.setTopAnchor(clubTable,50d);
+-            AnchorPane.setBottomAnchor(clubTable,80d);
+-
+-
+-            Button genMatch = new Button("Add Match");
+-            AnchorPane.setRightAnchor(genMatch,20d);
+-            AnchorPane.setBottomAnchor(genMatch,20d);
+-            genMatch.setOnAction(event -> {
+-                genarateMatch();
+-                update();
+-                clubTable.setItems(dataToTable(matchlistData));
+-
+-            });
+-
+-            Label title = new Label("Match Details");
+-            title.setStyle("-fx-font: 20 arial;");
+-            AnchorPane.setTopAnchor(title,20d);
+-            AnchorPane.setLeftAnchor(title, 20d);
+-
+-
+-            Button switchtable = new Button("switch table");
+-            AnchorPane.setRightAnchor(switchtable,200d);
+-            AnchorPane.setBottomAnchor(switchtable,20d);
+-            switchtable.setOnAction(event -> {
+-                System.out.println("state = " + state);
+-                if (state){
+-                    matchTableScreen(window);
+-                    state=false;
+-                }else {
+-                    clubTableScreen(window);
+-                    state=true;
+-                }
+-                window.show();
+-            });
+-
+-            first.getChildren().addAll(clubTable,title,switchtable,genMatch);
+-            window.show();
+-        }
+-
+-        public int generateScore(){
+-            return (int) (Math.random() * ((20 - 1) + 1)) + 1;
+-        }
+-        public int generateTeam(){
+-            return (int) (Math.random() * (clublistData.size())+1);
+-        }
+-        public void genarateMatch() {
+-            PremierLeagueManager club = PremierLeagueManager.getInstance();
+-
+-            if (clublistData.size()<2){
+-                Alert a = new Alert(Alert.AlertType.WARNING);
+-                a.setHeaderText("Not Enough Clubs ");
+-                a.setContentText("you need more 2 or more clubs to genarate teams");
+-                a.showAndWait();
+-                return;
+-            }
+-
+-    //            date
+-            LocalDate start = LocalDate.of(2020, Month.JANUARY, 1);
+-            long days = ChronoUnit.DAYS.between(start, LocalDate.now());
+-            LocalDate randomDate = start.plusDays(new Random().nextInt((int) days + 1));
+-    //            score
+-            int oneClubScore = generateScore();
+-            int twoClubScore = generateScore();
+-    //            team
+-            SportsClub oneClub = clublistData.get(generateTeam());
+-            SportsClub twoClub = clublistData.get(generateTeam());
+-            while (oneClub==twoClub){
+-    //            System.out.println("repeat");
+-                twoClub = clublistData.get(generateTeam());
+-            }
+-
+-            matchlistData.add(club.addMatch(randomDate, oneClub, oneClubScore, twoClub, twoClubScore));
+-            Serialize load = new Serialize();
+-            load.serialize(clublistData,matchlistData);
+-
+-            Alert a = new Alert(Alert.AlertType.WARNING);
+-            a.setHeaderText("New Match ");
+-            a.setContentText("Team A :"+oneClub.getName()+
+-                            "\nTeam A Score :"+oneClubScore+
+-                            "\nTeam B :"+twoClub.getName()+
+-                            "\nTeam B Score :"+twoClubScore+
+-                            "\nDate : "+randomDate);
+-            a.showAndWait();
+-        }
+-    }
+-}
+\ No newline at end of file
+Index: src/FootballClub.java
+===================================================================
+--- src/FootballClub.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ src/FootballClub.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
+@@ -1,36 +0,0 @@
+-public class FootballClub extends SportsClub {
+-	private int goalsReceived;
+-	private int goalsScored;
+-
+-	public FootballClub(){}
+-
+-	public FootballClub(String name, String location) {
+-		this.name = name;
+-		this.location = location;
+-	}
+-
+-	public FootballClub(int goalsReceived, int goalsScored) {
+-		this.goalsReceived = goalsReceived;
+-		this.goalsScored = goalsScored;
+-	}
+-
+-	public int getGoalsReceived() {
+-		return goalsReceived;
+-	}
+-	public void setGoalsReceived(int goalsReceived) {
+-		this.goalsReceived = goalsReceived;
+-	}
+-	public int getGoalsScored() {
+-		return goalsScored;
+-	}
+-	public void setGoalsScored(int goalsScored) {
+-		this.goalsScored = goalsScored;
+-	}
+-
+-	@Override
+-	public String toString() {
+-		return  " \n"+super.toString()+
+-				" \ngoalsReceived : " + goalsReceived +
+-				" \ngoalsScored   : " + goalsScored;
+-	}
+-}
+\ No newline at end of file
+Index: src/Serialize.java
+===================================================================
+--- src/Serialize.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ src/Serialize.java	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
+@@ -1,99 +0,0 @@
+-import java.io.*;
+-import java.util.ArrayList;
+-import java.util.List;
+-
+-public class Serialize implements Serializable {
+-	public void serialize(List<SportsClub> clubList,List<Match> matchList) {
+-//		ArrayList<Object> data=new ArrayList<>();
+-
+-		try(FileOutputStream fileOut = new FileOutputStream("clubData.ser");
+-			ObjectOutputStream out = new ObjectOutputStream(fileOut)
+-		){
+-			for (SportsClub sc: clubList) {
+-				out.writeObject(sc);
+-			}
+-
+-			System.out.println("----|");
+-			System.out.println("Club Data Saved");
+-
+-		} catch (IOException fe){
+-			System.out.println("#############ERROR###########");
+-			System.out.println("IOException");
+-//			  fe.printStackTrace();
+-		}
+-		try(FileOutputStream fileOut = new FileOutputStream("matchData.ser");
+-			ObjectOutputStream out = new ObjectOutputStream(fileOut)
+-		){
+-			for (Match mt: matchList) {
+-				out.writeObject(mt);
+-			}
+-
+-			System.out.println("Match Data Saved");
+-			System.out.println("----|");
+-
+-		} catch (IOException fe){
+-			System.out.println("#############ERROR###########");
+-			System.out.println("IOException");
+-//			fe.printStackTrace();
+-		}
+-
+-	}
+-	public ArrayList<ArrayList> deserialize() {
+-		ArrayList <ArrayList> deserialized = new ArrayList<>();
+-		ArrayList <SportsClub> clubData = new ArrayList<>();
+-		ArrayList <Match> matchData = new ArrayList<>();
+-
+-		try(FileInputStream fileIn = new FileInputStream("clubData.ser");
+-			ObjectInputStream in = new ObjectInputStream(fileIn)
+-		){
+-
+-			while(in.available()>=0){
+-				clubData.add((SportsClub) in.readObject());
+-			}
+-
+-		} catch (FileNotFoundException e) {
+-//			e.printStackTrace();
+-			System.out.println("----|");
+-			System.out.println("Data not available to load");
+-			System.out.println("----|");
+-			return deserialized;
+-		} catch (EOFException eo) {
+-//			end of file
+-		}catch (Exception c) {
+-//			c.printStackTrace();
+-			System.out.println("#############ERROR");
+-			System.out.println(c.toString());
+-
+-		}
+-		System.out.println("----|");
+-		System.out.println("Club Data Loaded");
+-
+-		try(FileInputStream fileIn = new FileInputStream("matchData.ser");
+-			ObjectInputStream in = new ObjectInputStream(fileIn)
+-		){
+-			while(in.available()>=0){
+-				matchData.add((Match) in.readObject());
+-			}
+-
+-		} catch (FileNotFoundException e) {
+-//			e.printStackTrace();
+-			System.out.println("----|");
+-			System.out.println("Data not available to load");
+-			System.out.println("----|");
+-			return deserialized;
+-		} catch (EOFException eo) {
+-//			end of file
+-		} catch (Exception c) {
+-			System.out.println(c.toString());
+-//			c.printStackTrace();
+-			System.out.println("#############ERROR");
+-			System.out.println(c.toString());
+-		}
+-		System.out.println("Match Data Loaded");
+-		System.out.println("----|");
+-
+-		deserialized.add(clubData);
+-		deserialized.add(matchData);
+-		return deserialized;
+-	}
+-}
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"JavaScriptSettings\">\r\n    <option name=\"languageLevel\" value=\"ES6\" />\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_13\" default=\"false\" project-jdk-name=\"1.8\" project-jdk-type=\"JavaSDK\">\r\n    <output url=\"file://$PROJECT_DIR$/out\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/misc.xml	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ .idea/misc.xml	(date 1611557026541)
+@@ -1,9 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+-  <component name="JavaScriptSettings">
+-    <option name="languageLevel" value="ES6" />
+-  </component>
+-  <component name="ProjectRootManager" version="2" languageLevel="JDK_13" default="false" project-jdk-name="1.8" project-jdk-type="JavaSDK">
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+     <output url="file://$PROJECT_DIR$/out" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/modules.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ProjectModuleManager\">\r\n    <modules>\r\n      <module fileurl=\"file://$PROJECT_DIR$/.idea/Premier League.iml\" filepath=\"$PROJECT_DIR$/.idea/Premier League.iml\" />\r\n    </modules>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/modules.xml	(revision 1ec26b8b37cd2d40de49a10cf876f41967f25925)
++++ .idea/modules.xml	(date 1611557026566)
+@@ -2,7 +2,7 @@
+ <project version="4">
+   <component name="ProjectModuleManager">
+     <modules>
+-      <module fileurl="file://$PROJECT_DIR$/.idea/Premier League.iml" filepath="$PROJECT_DIR$/.idea/Premier League.iml" />
++      <module fileurl="file://$PROJECT_DIR$/PremierLeagueManager.iml" filepath="$PROJECT_DIR$/PremierLeagueManager.iml" />
+     </modules>
+   </component>
+ </project>
+\ No newline at end of file
